@@ -1,7 +1,13 @@
 import axios from "axios";
 import { cEnv } from "../consts/env.const";
 import { eExerciseLevel, eExerciseType, eFocusPart } from "../enums/exercise.enum";
-import { iExerciseLevelDetails } from "../interfaces/exercise.interface";
+import {
+    iCommonMistakeCorrection,
+    iExerciseLevelDetails,
+    iHealthProfilePrecaution,
+    iStepByStepInstruction,
+    iTargetMuscles,
+} from "../interfaces/exercise.interface";
 import { iYogaDetailsResult, iYogaInstruction } from "../interfaces/yoga.interface";
 
 export interface iExerciseMetricsResult {
@@ -9,6 +15,11 @@ export interface iExerciseMetricsResult {
     equipmentRequired: string;
     description: string;
     levels: iExerciseLevelDetails[];
+    healthProfilePrecaution: iHealthProfilePrecaution;
+    targetMuscles: iTargetMuscles;
+    stepByStepInstructions: iStepByStepInstruction[];
+    commonMistakesAndCorrections: iCommonMistakeCorrection[];
+    breathingPattern: string;
 }
 
 export interface iMoodInsightsResponse {
@@ -46,7 +57,52 @@ export default class GeminiService {
         const getDefaultMetrics = (): iExerciseMetricsResult => ({
             exerciseType: eExerciseType.STRENGTH,
             equipmentRequired: "None (Bodyweight)",
-            description: `${name} is an effective exercise targeting the ${focusPart.toLowerCase()} region. It builds functional strength, muscular endurance, and core stability. Mobility is primarily emphasized in the joints supporting the ${focusPart.toLowerCase()} movement chain. Suitable for general fitness enthusiasts, beginners, and athletes aiming to improve overall conditioning. Individuals with acute joint pain, recent surgeries, spinal issues, or severe mobility limitations in the active regions should avoid this movement or perform modified variations under qualified guidance.`,
+            description: `${name} is an effective exercise targeting the ${focusPart.toLowerCase()} region. It builds functional strength, muscular endurance, and core stability. Mobility is primarily emphasized in the joints supporting the ${focusPart.toLowerCase()} movement chain. Suitable for general fitness enthusiasts, beginners, and athletes aiming to improve overall conditioning.`,
+            healthProfilePrecaution: {
+                title: `Caution for individuals with acute ${focusPart.toLowerCase()} or joint issues`,
+                description: `High load or poor form can strain the joints and connective tissues supporting the ${focusPart.toLowerCase()} region. Not recommended with acute joint inflammation or recent surgery.`,
+                conditions: [`Acute ${focusPart} Pain`, "Tendinitis", "Recent Surgery"],
+            },
+            targetMuscles: {
+                primaryFocus: {
+                    name: focusPart,
+                    anatomicalName: `${focusPart} Complex`,
+                },
+                secondaryFocus: ["Core Stabilizers", "Supporting Joints"],
+            },
+            stepByStepInstructions: [
+                {
+                    stepNumber: 1,
+                    title: "Setup and Stance",
+                    description: `Assume a stable, balanced starting position with feet grounded and core braced to support the ${focusPart.toLowerCase()} movement.`,
+                    tip: "Maintain a neutral spine and keep your shoulders engaged.",
+                },
+                {
+                    stepNumber: 2,
+                    title: "Initiate Movement",
+                    description: `Begin the movement with controlled tempo, focusing on feeling tension directly in the ${focusPart.toLowerCase()}.`,
+                    tip: "Control the eccentric phase without rushing through the repetition.",
+                },
+                {
+                    stepNumber: 3,
+                    title: "Peak Contraction and Reset",
+                    description: "Complete the repetition to full contraction, pausing momentarily before returning under control.",
+                    tip: "Avoid relying on momentum or hyperextending your joints.",
+                },
+            ],
+            commonMistakesAndCorrections: [
+                {
+                    avoid: "Using excessive momentum instead of controlled muscle tension",
+                    fix: "Slow down each repetition and pause briefly at the peak of the movement.",
+                    why: "Momentum shifts the mechanical load away from target muscles and elevates joint shear stress.",
+                },
+                {
+                    avoid: "Allowing core stability and posture to collapse during difficult reps",
+                    fix: "Engage your abdominal wall and glutes throughout the full range of motion.",
+                    why: "Compromised posture increases vulnerability to spine and connective tissue strain.",
+                },
+            ],
+            breathingPattern: `Inhale deeply during the preparation or lowering phase. Exhale forcefully through pursed lips during the concentric exertion phase of ${name}.`,
             levels: [
                 {
                     level: eExerciseLevel.BEGINNER,
@@ -95,17 +151,34 @@ export default class GeminiService {
         const candidateModels = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
 
         const prompt = `You are a professional fitness coach, physical therapist, and biomechanics expert.
-For the exercise "${name}" (Target focus part: "${focusPart}"):
+For the exercise "${name}" (Target focus body part: "${focusPart}"):
 
 1. Determine the exercise category type (must be ONE of: "Strength", "Cardio", "Flexibility", "Balance", "HIIT").
-2. Determine the exact equipment required for this exercise (e.g., "Barbell & Squat Rack", "Dumbbells", "Pull-up Bar", "None (Bodyweight)", "Gym Mat", "Resistance Band", etc.).
-3. Write a comprehensive, well-structured, professional description covering:
-   - Target Muscles & Affected Areas: Specify primary and secondary muscles targeted and how the exercise impacts the body.
-   - Mobility & Joint Focus: Detail which body parts or joints experience and require the most mobility and range of motion (e.g., hips, ankles, thoracic spine, shoulders).
-   - Who Can Do It: Explain suitability, ideal fitness levels (beginners, athletes, general fitness), and who benefits most.
-   - Who Should Avoid / Contraindications: Explain clearly who should NOT perform this exercise or who needs caution/modifications (e.g., individuals with specific joint issues, spine/lower back pain, recent surgeries, high blood pressure, or acute injuries).
-4. Calculate realistic exercise metrics for ALL 4 difficulty levels: "Beginner", "Intermediate", "Advanced", and "Athelete".
-
+2. Determine the exact equipment required for this exercise (e.g., "Barbell & Flat Bench", "Dumbbells", "Pull-up Bar", "None (Bodyweight)", "Gym Mat", "Resistance Band", etc.).
+3. Write a comprehensive, well-structured, professional description covering affected areas, mobility focus, suitability, and benefits.
+4. Detail the "healthProfilePrecaution":
+   - "title" (string): Concise warning heading (e.g. "Not recommended with Shoulder Impingement").
+   - "description" (string): Clinical explanation of what position or load strains what joint/capsule, and who should avoid or exercise caution.
+   - "conditions" (array of strings): Specific contraindication condition names (e.g. ["Shoulder Impingement", "Rotator Cuff Tear"]).
+5. Detail the "targetMuscles":
+   - "primaryFocus": An object with:
+       - "name" (string): Common muscle name (e.g. "Mid Chest", "Upper Chest", "Lats", "Quadriceps").
+       - "anatomicalName" (string): Formal medical/anatomical name (e.g. "Pectoralis Major (Sternal Head)", "Latissimus Dorsi").
+   - "secondaryFocus" (array of strings): Secondary muscles and stabilizers recruited (e.g. ["Front Shoulders", "Triceps", "Core & Lats"]).
+6. Provide "stepByStepInstructions" (array of 3 to 4 sequential step objects):
+   For each step:
+   - "stepNumber" (number: 1, 2, 3, 4...).
+   - "title" (string: concise step action name, e.g. "Set Your Base & Grip", "Unrack and Stabilize", "Controlled Descent", "Drive & Lockout").
+   - "description" (string: precise execution details).
+   - "tip" (string: coach tip / pro-cue, e.g. "Retract your shoulder blades and pinch them firmly into the bench.").
+7. Provide "commonMistakesAndCorrections" (array of 2 to 3 mistake objects):
+   For each mistake:
+   - "avoid" (string: mistake label, e.g. "Bouncing bar off the sternum").
+   - "fix" (string: actionable solution, e.g. "Pause for half a second at the chest before pressing.").
+   - "why" (string: biomechanical rationale, e.g. "Bouncing uses momentum instead of muscle tension and can bruise cartilage or ribs.").
+8. Provide "breathingPattern" (string):
+   Exact inhalation and exhalation cues during the repetition phases (e.g. "Inhale slowly as you lower the barbell to mid-chest. Exhale powerfully as you press back up.").
+9. Calculate realistic exercise metrics for ALL 4 difficulty levels: "Beginner", "Intermediate", "Advanced", and "Athelete".
 For each difficulty level, calculate:
 - "repetition" (number): Repetitions per set.
 - "sets" (number): Total number of sets.
@@ -115,10 +188,15 @@ For each difficulty level, calculate:
 - "totalTimeToComplete" (number): Total duration in seconds to finish all sets including rest intervals (calculated as (sets * durationPerSet) + ((sets - 1) * restTime)).
 
 Return ONLY a valid JSON object with the exact keys:
-- "exerciseType" (string: one of "Strength", "Cardio", "Flexibility", "Balance", "HIIT").
-- "equipmentRequired" (string: name of required equipment).
-- "description" (string: structured comprehensive explanation covering affected areas, mobility focus, who can do it, and contraindications).
-- "levels" (array of 4 objects with exact keys: "level", "repetition", "sets", "restTime", "caloriesBurn", "durationPerSet", "totalTimeToComplete").`;
+- "exerciseType" (string)
+- "equipmentRequired" (string)
+- "description" (string)
+- "healthProfilePrecaution" (object with title, description, conditions)
+- "targetMuscles" (object with primaryFocus { name, anatomicalName }, secondaryFocus string array)
+- "stepByStepInstructions" (array of { stepNumber, title, description, tip })
+- "commonMistakesAndCorrections" (array of { avoid, fix, why })
+- "breathingPattern" (string)
+- "levels" (array of 4 objects with { level, repetition, sets, restTime, caloriesBurn, durationPerSet, totalTimeToComplete })`;
 
         for (const modelName of candidateModels) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
@@ -167,19 +245,71 @@ Return ONLY a valid JSON object with the exact keys:
                     ? parsed.description.trim()
                     : getDefaultMetrics().description;
 
+                // Health Profile Precaution
+                const healthProfilePrecaution: iHealthProfilePrecaution = {
+                    title: typeof parsed?.healthProfilePrecaution?.title === "string" && parsed.healthProfilePrecaution.title.trim().length > 0
+                        ? parsed.healthProfilePrecaution.title.trim()
+                        : getDefaultMetrics().healthProfilePrecaution.title,
+                    description: typeof parsed?.healthProfilePrecaution?.description === "string" && parsed.healthProfilePrecaution.description.trim().length > 0
+                        ? parsed.healthProfilePrecaution.description.trim()
+                        : getDefaultMetrics().healthProfilePrecaution.description,
+                    conditions: Array.isArray(parsed?.healthProfilePrecaution?.conditions) && parsed.healthProfilePrecaution.conditions.length > 0
+                        ? parsed.healthProfilePrecaution.conditions.map((c: any) => String(c).trim()).filter(Boolean)
+                        : getDefaultMetrics().healthProfilePrecaution.conditions,
+                };
+
+                // Target Muscles
+                const targetMuscles: iTargetMuscles = {
+                    primaryFocus: {
+                        name: typeof parsed?.targetMuscles?.primaryFocus?.name === "string" && parsed.targetMuscles.primaryFocus.name.trim().length > 0
+                            ? parsed.targetMuscles.primaryFocus.name.trim()
+                            : focusPart,
+                        anatomicalName: typeof parsed?.targetMuscles?.primaryFocus?.anatomicalName === "string" && parsed.targetMuscles.primaryFocus.anatomicalName.trim().length > 0
+                            ? parsed.targetMuscles.primaryFocus.anatomicalName.trim()
+                            : `${focusPart} Complex`,
+                    },
+                    secondaryFocus: Array.isArray(parsed?.targetMuscles?.secondaryFocus) && parsed.targetMuscles.secondaryFocus.length > 0
+                        ? parsed.targetMuscles.secondaryFocus.map((s: any) => String(s).trim()).filter(Boolean)
+                        : getDefaultMetrics().targetMuscles.secondaryFocus,
+                };
+
+                // Step-by-Step Instructions
+                const rawInstructions = Array.isArray(parsed?.stepByStepInstructions) && parsed.stepByStepInstructions.length > 0
+                    ? parsed.stepByStepInstructions
+                    : getDefaultMetrics().stepByStepInstructions;
+
+                const stepByStepInstructions: iStepByStepInstruction[] = rawInstructions.map((step: any, index: number) => ({
+                    stepNumber: typeof step.stepNumber === "number" && !isNaN(step.stepNumber) ? step.stepNumber : index + 1,
+                    title: typeof step.title === "string" && step.title.trim().length > 0 ? step.title.trim() : `Step ${index + 1}`,
+                    description: typeof step.description === "string" && step.description.trim().length > 0 ? step.description.trim() : "",
+                    tip: typeof step.tip === "string" ? step.tip.trim() : "",
+                }));
+
+                // Common Mistakes & Corrections
+                const rawMistakes = Array.isArray(parsed?.commonMistakesAndCorrections) && parsed.commonMistakesAndCorrections.length > 0
+                    ? parsed.commonMistakesAndCorrections
+                    : getDefaultMetrics().commonMistakesAndCorrections;
+
+                const commonMistakesAndCorrections: iCommonMistakeCorrection[] = rawMistakes.map((item: any) => ({
+                    avoid: typeof item.avoid === "string" && item.avoid.trim().length > 0 ? item.avoid.trim() : "Improper Form",
+                    fix: typeof item.fix === "string" && item.fix.trim().length > 0 ? item.fix.trim() : "Maintain controlled tempo and proper posture.",
+                    why: typeof item.why === "string" && item.why.trim().length > 0 ? item.why.trim() : "Reduces strain and maximizes muscle activation.",
+                }));
+
+                // Breathing Pattern
+                const breathingPattern = typeof parsed.breathingPattern === "string" && parsed.breathingPattern.trim().length > 0
+                    ? parsed.breathingPattern.trim()
+                    : getDefaultMetrics().breathingPattern;
+
                 // Levels
                 const levelsArr = parsed?.levels;
-                if (!Array.isArray(levelsArr) || levelsArr.length === 0) {
-                    return { exerciseType, equipmentRequired, description, levels: getDefaultMetrics().levels };
-                }
-
                 const validLevels = Object.values(eExerciseLevel);
                 const mappedLevels: iExerciseLevelDetails[] = validLevels.map((lvl) => {
-                    const found = levelsArr.find((item: any) => {
+                    const found = Array.isArray(levelsArr) ? levelsArr.find((item: any) => {
                         const itemLvl = String(item.level || "").toLowerCase().trim();
                         const targetLvl = String(lvl).toLowerCase().trim();
                         return itemLvl === targetLvl || (targetLvl === "athelete" && itemLvl === "athlete");
-                    });
+                    }) : null;
 
                     if (found) {
                         const sets = typeof found.sets === "number" && !isNaN(found.sets) ? Math.max(1, Math.round(found.sets)) : 3;
@@ -205,7 +335,17 @@ Return ONLY a valid JSON object with the exact keys:
                     return getDefaultMetrics().levels.find((d) => d.level === lvl)!;
                 });
 
-                return { exerciseType, equipmentRequired, description, levels: mappedLevels };
+                return {
+                    exerciseType,
+                    equipmentRequired,
+                    description,
+                    healthProfilePrecaution,
+                    targetMuscles,
+                    stepByStepInstructions,
+                    commonMistakesAndCorrections,
+                    breathingPattern,
+                    levels: mappedLevels,
+                };
             } catch (error: unknown) {
                 console.warn(`GeminiService generateExerciseMetrics with model ${modelName} failed, trying next candidate:`, error);
             }
@@ -214,6 +354,7 @@ Return ONLY a valid JSON object with the exact keys:
         console.error("All Gemini API models failed in generateExerciseMetrics, returning fallback metrics");
         return getDefaultMetrics();
     };
+
 
     public generateYogaDetails = async (input: {
         englishName?: string;

@@ -14,8 +14,28 @@
 
 ## Purpose & Overview
 `ExerciseController` manages the central exercise movement repository in FitLog. It provides:
-1. **AI-Powered Exercise Creation**: Administrators provide minimal input (movement name, focus part, optional image/description). The backend automatically interfaces with Google Gemini GenAI via LangChain to generate exercise classification, required equipment, detailed movement description, and a 3-tier difficulty structure (Beginner, Intermediate, Advanced) with calibrated sets, reps, duration, rest intervals, and calorie burns.
-2. **Exercise Querying & Catalog Listing**: Multi-dimensional filtering by muscle group (`focusPart`), exercise discipline (`exerciseType`), and difficulty level (`exerciseLevel`), with optional pagination and dynamic level-slicing.
+1. **AI-Powered Exercise Creation with Rich Clinical & Biomechanical Data**:
+   Administrators provide minimal input (movement name, focus part, optional image/video). The backend automatically interfaces with Google Gemini GenAI to generate:
+   - Exercise classification (`exerciseType`) & required equipment (`equipmentRequired`).
+   - Movement overview (`description`).
+   - 4-tier difficulty progression (`levels`: Beginner, Intermediate, Advanced, Athlete) with repetitions, sets, rest intervals, calorie burn, duration per set, and total time to complete.
+   - **Health Profile Precaution** (`healthProfilePrecaution`): Warning heading, clinical explanation of joint/tissue strain, and specific contraindication conditions (e.g. *Shoulder Impingement, Rotator Cuff Tear*).
+   - **Target Muscles** (`targetMuscles`):
+     - `primaryFocus`: Common name (e.g. *Mid Chest*) and anatomical/medical name (e.g. *Pectoralis Major (Sternal Head)*).
+     - `secondaryFocus`: Array of recruited secondary and stabilizer muscles (e.g. *Front Shoulders, Triceps, Core & Lats*).
+   - **Step-by-Step Instructions** (`stepByStepInstructions`): Numbered sequential phases (*Set Your Base & Grip, Unrack and Stabilize, Controlled Descent, Drive & Lockout*) with pro tips/cues.
+   - **Common Mistakes & Corrections** (`commonMistakesAndCorrections`): Pairs detailing what to *AVOID* (e.g. *Bouncing bar off the sternum*), how to *FIX* it, and the anatomical *WHY* rationale.
+   - **Breathing Pattern** (`breathingPattern`): Exact inhalation/exhalation cues per repetition phase.
+2. **Exercise Querying & User-End Filters**:
+   Supports user-end backend filtering by:
+   - `focusPart` (muscle group, e.g. "Chest", "Legs"; "Full Body" fetches all).
+   - `exerciseType` (e.g. "Strength", "Cardio", "HIIT").
+   - `level` / `exerciseLevel` (e.g. "Beginner", "Intermediate", "Advanced", "Athelete").
+   - `equipmentRequired` (regex match for equipment like "Barbell", "Dumbbells", "None (Bodyweight)").
+   - `totalTimeToComplete` (finds exercises completing within `$lte` seconds).
+   - Pagination (`page`, `limit`).
+3. **Single Exercise Detail**:
+   `GET /api/v1/exercise/:id?level=Intermediate` fetches the full UI-ready exercise profile.
 
 ---
 
@@ -24,39 +44,24 @@
 ### 1. Create Exercise (with Gemini AI Auto-Generation)
 - **Endpoint**: `POST /api/v1/exercise/create`
 - **Method Handler**: `ExerciseController.instance.createExercise(req: Request, res: Response): Promise<void>`
-- **Reason & Purpose**:
-  - Adds a new exercise into the master catalog without requiring manual authoring of complex multi-tier sets/reps/calorie data.
-  - Generates comprehensive biomechanical metrics automatically using Gemini AI.
 - **Request Body Contract** (`iCreateExercisePayload`):
   ```json
   {
-    "name": "Barbell Incline Bench Press",
+    "name": "Flat Barbell Bench Press",
     "focusPart": "Chest",
-    "description": "Optional custom description. If omitted, Gemini AI writes one.",
-    "imageUrl": "https://assets.fitlog.com/exercises/incline-bench.gif"
+    "description": "Optional description. If omitted, Gemini AI writes one.",
+    "imageUrl": "https://assets.fitlog.com/exercises/flat-bench.png",
+    "videoUrl": "https://assets.fitlog.com/exercises/flat-bench.mp4"
   }
   ```
+  *(Note: Admins can optionally override or provide custom `equipmentRequired`, `exerciseType`, `healthProfilePrecaution`, `targetMuscles`, `stepByStepInstructions`, `commonMistakesAndCorrections`, `breathingPattern`, or `levels`. Any omitted fields are generated automatically by Gemini AI).*
 - **Validation**:
   - Handled by `ExerciseValidator.instance.createSchema` in [exercise.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/exercise.validator.ts).
-  - Validates `name` (required string), `focusPart` (must match `eFocusPart` enum), optional `description`, optional `imageUrl`.
 - **Business Logic & AI Workflow**:
-  1. Validates input schema; returns `400 BAD_REQUEST` on Joi error.
-  2. Duplicate check:
-     ```typescript
-     await ExerciseDb.findOne({ name: payload.name.trim(), isDeleted: false });
-     ```
-     Aborts with `400 BAD_REQUEST` if an exercise with that name already exists.
-  3. Invokes Gemini AI service:
-     ```typescript
-     const { exerciseType, equipmentRequired, description: aiDescription, levels } =
-         await GeminiService.instance.generateExerciseMetrics(payload.name.trim(), payload.focusPart);
-     ```
-  4. Resolves description: uses `payload.description` if provided; otherwise uses `aiDescription`.
-  5. Assembles document with generated 3-tier `levels`:
-     - Beginner: lower sets, higher rest, lower calorie burn.
-     - Intermediate: balanced sets/reps.
-     - Advanced: higher sets/intensity, lower rest.
-  6. Saves and returns the created `ExerciseDb` document.
+  1. Validates input schema (`400 BAD_REQUEST` on Joi error).
+  2. Duplicate check: searches `ExerciseDb` for `{ name: payload.name.trim(), isDeleted: false }`.
+  3. Checks if add-on fields or level metrics are missing; if so, calls `GeminiService.instance.generateExerciseMetrics(payload.name.trim(), payload.focusPart)`.
+  4. Saves complete document into MongoDB via `ExerciseDb`.
 - **Response Shape** (`iResponse`):
   ```json
   {
@@ -64,104 +69,146 @@
     "message": "Exercise created successfully",
     "httpCode": 200,
     "data": {
-      "_id": "67a3f8...",
-      "name": "Barbell Incline Bench Press",
-      "description": "Lie back on an incline bench set at 30-45 degrees...",
+      "id": "67a3f8...",
+      "name": "Flat Barbell Bench Press",
+      "description": "Flat Barbell Bench Press targets the chest complex...",
       "focusPart": "Chest",
       "exerciseType": "Strength",
-      "equipmentRequired": "Barbell, Incline Bench",
-      "imageUrl": "https://assets.fitlog.com/exercises/incline-bench.gif",
+      "equipmentRequired": "Barbell & Flat Bench",
+      "image": "https://assets.fitlog.com/exercises/flat-bench.png",
+      "imageUrl": "https://assets.fitlog.com/exercises/flat-bench.png",
+      "video": "https://assets.fitlog.com/exercises/flat-bench.mp4",
+      "videoUrl": "https://assets.fitlog.com/exercises/flat-bench.mp4",
+      "healthProfilePrecaution": {
+        "title": "Not recommended with Shoulder Impingement",
+        "description": "High load at the bottom position strains the anterior shoulder joint capsule and wrists. Not recommended with acute shoulder or wrist injuries.",
+        "conditions": [
+          "Shoulder Impingement",
+          "Rotator Cuff Tear"
+        ]
+      },
+      "targetMuscles": {
+        "primaryFocus": {
+          "name": "Mid Chest",
+          "anatomicalName": "Pectoralis Major (Sternal Head)"
+        },
+        "secondaryFocus": [
+          "Front Shoulders",
+          "Triceps",
+          "Core & Lats"
+        ]
+      },
+      "stepByStepInstructions": [
+        {
+          "stepNumber": 1,
+          "title": "Set Your Base & Grip",
+          "description": "Lie flat on the bench with eyes directly under the racked bar. Plant your feet flat on the floor and grip the bar slightly wider than shoulder-width with wrists straight.",
+          "tip": "Retract your shoulder blades and pinch them firmly into the bench."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Unrack and Stabilize",
+          "description": "Take a deep breath into your belly, unrack the barbell by straightening arms, and move the bar horizontally over your mid-chest.",
+          "tip": "Keep elbows soft, do not aggressively hyperextend your joints."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Controlled Descent",
+          "description": "Lower the barbell slowly in a controlled 2-3 second tempo until it gently touches the lower-to-middle chest, tucking elbows at roughly 45-degree angle.",
+          "tip": "Do not flare elbows wide out to 90 degrees to protect rotator cuffs."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Drive & Lockout",
+          "description": "Press through your palms and drive the bar up in a slight arc back towards your eye level, locking out under control.",
+          "tip": "Keep glutes and upper back glued to the bench throughout all reps."
+        }
+      ],
+      "commonMistakesAndCorrections": [
+        {
+          "avoid": "Bouncing bar off the sternum",
+          "fix": "Pause for half a second at the chest before pressing.",
+          "why": "Bouncing uses momentum instead of muscle tension and can bruise cartilage or ribs."
+        },
+        {
+          "avoid": "Flaring elbows at 90 degrees",
+          "fix": "Tuck elbows inward at roughly 45 to 60 degrees from torso.",
+          "why": "Extreme flare places excessive stress on the subacromial space and rotator cuffs."
+        },
+        {
+          "avoid": "Lifting hips off the bench",
+          "fix": "Keep glutes and upper back glued to the bench throughout all reps.",
+          "why": "Excessive arching destabilizes the spine and invalidates range of motion."
+        }
+      ],
+      "breathingPattern": "Inhale slowly as you lower the barbell to mid-chest. Exhale powerfully as you press back up.",
       "levels": [
         {
           "level": "Beginner",
+          "repetition": 8,
           "sets": 3,
-          "reps": 8,
-          "durationPerSet": 30,
-          "restBetweenSets": 90,
+          "restTime": 90,
           "caloriesBurn": 45,
-          "totalTimeToComplete": 360
+          "durationPerSet": 30,
+          "totalTimeToComplete": 270
         },
         {
           "level": "Intermediate",
+          "repetition": 10,
           "sets": 4,
-          "reps": 10,
+          "restTime": 60,
+          "caloriesBurn": 75,
           "durationPerSet": 35,
-          "restBetweenSets": 60,
-          "caloriesBurn": 70,
-          "totalTimeToComplete": 400
+          "totalTimeToComplete": 320
         },
         {
           "level": "Advanced",
-          "sets": 5,
-          "reps": 12,
-          "durationPerSet": 40,
-          "restBetweenSets": 45,
+          "repetition": 12,
+          "sets": 4,
+          "restTime": 45,
           "caloriesBurn": 105,
-          "totalTimeToComplete": 425
+          "durationPerSet": 40,
+          "totalTimeToComplete": 295
+        },
+        {
+          "level": "Athelete",
+          "repetition": 15,
+          "sets": 5,
+          "restTime": 30,
+          "caloriesBurn": 150,
+          "durationPerSet": 45,
+          "totalTimeToComplete": 345
         }
-      ],
-      "isDeleted": false,
-      "createdAt": "2026-10-12T05:00:00.000Z"
+      ]
     }
   }
   ```
 
 ---
 
-### 2. Get Exercises (List & Filter)
+### 2. Get Exercises (List & User-End Filters)
 - **Endpoint**: `GET /api/v1/exercise/list`
 - **Method Handler**: `ExerciseController.instance.getExercises(req: Request, res: Response): Promise<void>`
-- **Reason & Purpose**:
-  - Powers exercise exploration, filtering for workout plan builders, and mobile catalog browsing.
-  - Supports filtering by `focusPart`, `exerciseType`, and `exerciseLevel`.
-  - When filtering by `exerciseLevel`, extracts the specific level parameters into a top-level `selectedLevel` property for simplified frontend consumption.
-  - Supports unpaginated list or structured pagination metadata (`total`, `page`, `limit`, `totalPages`, `hasNextPage`, `hasPrevPage`).
 - **Query Parameters** (`iGetExercisesQuery`):
-  - `focusPart` (optional string): Body target. Note: If `"Full Body"` is passed, `filterQuery.focusPart` is intentionally not restricted, fetching exercises across all body regions.
-  - `exerciseType` (optional string): e.g. "Strength", "Cardio", "Stretching".
-  - `exerciseLevel` (optional string): e.g. "Beginner", "Intermediate", "Advanced".
+  - `focusPart` (optional string): e.g. "Chest", "Legs", "Back".
+  - `exerciseType` (optional string): e.g. "Strength", "Cardio", "HIIT".
+  - `level` / `exerciseLevel` (optional string): e.g. "Beginner", "Intermediate", "Advanced", "Athelete".
+  - `equipmentRequired` (optional string): Regex search (e.g. "Dumbbell", "Barbell", "Bodyweight").
+  - `totalTimeToComplete` (optional number): Filters routines where `totalTimeToComplete <= value`.
   - `page` (optional number, min 1).
   - `limit` (optional number, min 1).
-- **Validation**:
-  - Handled by `ExerciseValidator.instance.getExercisesQuerySchema` in [exercise.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/exercise.validator.ts).
-- **Business Logic & Level Slicing**:
-  1. Validates query parameters.
-  2. Builds filter: `{ isDeleted: false }`. Adds `focusPart` (if not Full Body), `exerciseType`, and `levels.level` matches.
-  3. Performs query with `.sort({ createdAt: -1 })`.
-  4. If `exerciseLevel` was requested, transforms the exercise: finds the matching element in `levels`, assigns it to `selectedLevel`, and strips the full `levels` array from the result payload.
-  5. Returns either a raw array (unpaginated) or a paginated envelope object `{ exercises, pagination }`.
-- **Response Shape (Paginated Example)**:
-  ```json
-  {
-    "status": "SUCCESS",
-    "message": "Exercises fetched successfully",
-    "httpCode": 200,
-    "data": {
-      "exercises": [
-        {
-          "_id": "67a3f8...",
-          "name": "Barbell Incline Bench Press",
-          "focusPart": "Chest",
-          "exerciseType": "Strength",
-          "selectedLevel": {
-            "level": "Intermediate",
-            "sets": 4,
-            "reps": 10,
-            "durationPerSet": 35,
-            "restBetweenSets": 60,
-            "caloriesBurn": 70,
-            "totalTimeToComplete": 400
-          }
-        }
-      ],
-      "pagination": {
-        "total": 42,
-        "page": 1,
-        "limit": 10,
-        "totalPages": 5,
-        "hasNextPage": true,
-        "hasPrevPage": false
-      }
-    }
-  }
-  ```
+- **Behavior When Level Filter is Applied**:
+  When `level` or `exerciseLevel` is passed in the query, the response formats each exercise with top-level attributes:
+  `id`, `image`, `video`, `level`, `sets`, `repetitions`, `restTime`, `caloriesBurn`, `durationPerSet`, `totalTimeToComplete`, `healthProfilePrecaution`, `targetMuscles`, `stepByStepInstructions`, `commonMistakesAndCorrections`, and `breathingPattern`.
+
+---
+
+### 3. Get Exercise Detail by ID
+- **Endpoint**: `GET /api/v1/exercise/:id`
+- **Method Handler**: `ExerciseController.instance.getExerciseById(req: Request, res: Response): Promise<void>`
+- **Route Parameters**:
+  - `:id` (required, MongoDB ObjectId).
+- **Query Parameters**:
+  - `level` (optional, e.g. `?level=Intermediate`).
+- **Response Shape**:
+  Returns the complete exercise detail matching the mobile UI screen specifications.
