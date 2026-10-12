@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "rootDir": ".",
+        "esModuleInterop": true,
+        "outDir": "build",
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "composite": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["ES2023"],
+        "module": "NodeNext",
+        "noEmitOnError": true,
+        "moduleResolution": "NodeNext",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "pretty": true,
+        "sourceMap": true,
+        "stripInternal": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "target": "es2023"
+    },
+    "exclude": ["node_modules", "build", "eslint.config.mts"],
+    "include": ["src/**/*.ts", "test/**/*.ts"]
+}

@@ -1,0 +1,50 @@
+{
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/body-parser": "^1.19.6",
+        "@types/cors": "^2.8.19",
+        "@types/crypto-js": "^4.2.2",
+        "@types/dateformat": "^5.0.3",
+        "@types/express": "^5.0.6",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/mongo-sanitize": "^1.0.3",
+        "@types/multer": "^2.1.0",
+        "@types/node": "^25.3.5",
+        "@types/uuid": "^11.0.0",
+        "esbuild": "^0.28.0",
+        "eslint": "^10.0.3",
+        "globals": "^17.4.0",
+        "jiti": "^2.6.1",
+        "prettier": "^3.8.1",
+        "tsx": "^4.21.0",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.56.1"
+    },
+    "scripts": {
+        "dev": "nodemon --exec tsx src/index.ts",
+        "start": "node build/index.js",
+        "build": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=build/index.js --external:fsevents"
+    },
+    "dependencies": {
+        "@joi/date": "^2.1.1",
+        "@langchain/core": "^1.1.31",
+        "@langchain/google-genai": "^2.1.24",
+        "@langchain/langgraph": "^1.2.1",
+        "@openrouter/sdk": "^0.12.35",
+        "axios": "^1.13.6",
+        "cors": "^2.8.6",
+        "cron": "^4.4.0",
+        "crypto-js": "^4.2.0",
+        "dateformat": "^5.0.3",
+        "dotenv": "^17.3.1",
+        "express": "^5.2.1",
+        "joi": "^18.0.2",
+        "jsonwebtoken": "^9.0.3",
+        "langchain": "^1.2.30",
+        "mongo-sanitize": "^1.1.0",
+        "mongoose": "^9.2.4",
+        "nodemon": "^3.1.14",
+        "redis": "^6.0.0",
+        "uuid": "^14.0.0"
+    }
+}

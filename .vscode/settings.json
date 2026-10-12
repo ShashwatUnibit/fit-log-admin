@@ -1,0 +1,7 @@
+{
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "cSpell.words": ["appstore", "Kolkata", "playstore"],
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "debug.enableStatusBarColor": false
+}
