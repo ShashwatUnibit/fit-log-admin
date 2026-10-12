@@ -77,8 +77,8 @@ export default class ExerciseController {
                 ? payload.breathingPattern.trim()
                 : (aiMetrics?.breathingPattern || "");
 
-            const imageUrl = payload.imageUrl?.trim() || payload.image?.trim() || "";
-            const videoUrl = payload.videoUrl?.trim() || payload.video?.trim() || "";
+            const image = payload.image?.trim() || payload.imageUrl?.trim() || "";
+            const video = payload.video?.trim() || payload.videoUrl?.trim() || "";
 
             const newExercise = new ExerciseDb({
                 name: payload.name.trim(),
@@ -86,10 +86,8 @@ export default class ExerciseController {
                 focusPart: payload.focusPart,
                 exerciseType,
                 equipmentRequired,
-                imageUrl,
-                image: imageUrl,
-                videoUrl,
-                video: videoUrl,
+                image,
+                video,
                 healthProfilePrecaution,
                 targetMuscles,
                 stepByStepInstructions,
@@ -101,18 +99,11 @@ export default class ExerciseController {
             const exercise = await newExercise.save();
             const exerciseObj = exercise.toObject ? exercise.toObject() : exercise;
 
-            const responsePayload = {
-                id: exerciseObj._id,
-                ...exerciseObj,
-                image: exerciseObj.imageUrl || exerciseObj.image || "",
-                video: exerciseObj.videoUrl || exerciseObj.video || "",
-            };
-
             const responseData: iResponse = {
                 status: eResponseStatus.SUCCESS,
                 message: "Exercise created successfully",
                 httpCode: eHttpStatusCode.OK,
-                data: responsePayload,
+                data: exerciseObj,
             };
             EncryptionSecurity.instance.onResponse(req, res, responseData);
         } catch (err: unknown) {
@@ -179,9 +170,8 @@ export default class ExerciseController {
             const exercises = await query.lean();
 
             const formattedExercises = exercises.map((exercise) => {
-                const id = exercise._id;
-                const image = exercise.imageUrl || exercise.image || "";
-                const video = exercise.videoUrl || exercise.video || "";
+                const image = exercise.image || "";
+                const video = exercise.video || "";
 
                 if (targetLevel) {
                     const matchedLevel = exercise.levels.find(
@@ -189,7 +179,6 @@ export default class ExerciseController {
                     ) || exercise.levels[0];
 
                     return {
-                        id,
                         ...exercise,
                         image,
                         video,
@@ -206,7 +195,6 @@ export default class ExerciseController {
                 }
 
                 return {
-                    id,
                     ...exercise,
                     image,
                     video,
@@ -274,10 +262,9 @@ export default class ExerciseController {
                 : exercise.levels[0];
 
             const responsePayload = {
-                id: exercise._id,
                 ...exercise,
-                image: exercise.imageUrl || exercise.image || "",
-                video: exercise.videoUrl || exercise.video || "",
+                image: exercise.image || "",
+                video: exercise.video || "",
                 selectedLevel: matchedLevel,
                 level: matchedLevel?.level,
                 sets: matchedLevel?.sets,

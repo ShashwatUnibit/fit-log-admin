@@ -78,9 +78,7 @@ const ExerciseSchema = new Schema<iExercise>(
         focusPart: { type: String, required: true, enum: Object.values(eFocusPart) },
         exerciseType: { type: String, required: true, enum: Object.values(eExerciseType) },
         equipmentRequired: { type: String, trim: true, default: "None" },
-        imageUrl: { type: String, trim: true, default: "" },
         image: { type: String, trim: true, default: "" },
-        videoUrl: { type: String, trim: true, default: "" },
         video: { type: String, trim: true, default: "" },
         healthProfilePrecaution: { type: HealthProfilePrecautionSchema, default: () => ({}) },
         targetMuscles: { type: TargetMusclesSchema, default: () => ({}) },
@@ -96,21 +94,6 @@ const ExerciseSchema = new Schema<iExercise>(
         collection: cDbNames.exercise,
     }
 );
-
-// Synchronize imageUrl <-> image and videoUrl <-> video before saving
-ExerciseSchema.pre("save", function () {
-    if (this.imageUrl && !this.image) {
-        this.image = this.imageUrl;
-    } else if (this.image && !this.imageUrl) {
-        this.imageUrl = this.image;
-    }
-
-    if (this.videoUrl && !this.video) {
-        this.video = this.videoUrl;
-    } else if (this.video && !this.videoUrl) {
-        this.videoUrl = this.video;
-    }
-});
 
 const ExerciseDb: ExerciseModel = mongoose.model<iExercise>(cDbNames.exercise, ExerciseSchema, cDbNames.exercise);
 

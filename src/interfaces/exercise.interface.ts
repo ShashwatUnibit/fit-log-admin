@@ -42,15 +42,12 @@ export interface iExerciseLevelDetails {
 
 export interface iExercise {
     _id?: Schema.Types.ObjectId | Types.ObjectId | string;
-    id?: string;
     name: string;
     description?: string;
     focusPart: eFocusPart;
     exerciseType: eExerciseType;
     equipmentRequired: string;
-    imageUrl?: string;
     image?: string;
-    videoUrl?: string;
     video?: string;
     healthProfilePrecaution?: iHealthProfilePrecaution;
     targetMuscles?: iTargetMuscles;

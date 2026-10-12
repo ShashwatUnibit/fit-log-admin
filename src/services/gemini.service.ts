@@ -148,36 +148,40 @@ export default class GeminiService {
             return getDefaultMetrics();
         }
 
-        const candidateModels = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
+        const candidateModels = [
+            "gemini-3.5-flash-lite",
+            "gemini-3.5-flash",
+            "gemini-3.6-flash",
+        ];
 
         const prompt = `You are a professional fitness coach, physical therapist, and biomechanics expert.
 For the exercise "${name}" (Target focus body part: "${focusPart}"):
 
 1. Determine the exercise category type (must be ONE of: "Strength", "Cardio", "Flexibility", "Balance", "HIIT").
 2. Determine the exact equipment required for this exercise (e.g., "Barbell & Flat Bench", "Dumbbells", "Pull-up Bar", "None (Bodyweight)", "Gym Mat", "Resistance Band", etc.).
-3. Write a comprehensive, well-structured, professional description covering affected areas, mobility focus, suitability, and benefits.
+3. Write a concise, professional description: strictly 2 to 3 sentences (maximum 40-50 words) covering primary movement, target muscles, and functional benefits.
 4. Detail the "healthProfilePrecaution":
    - "title" (string): Concise warning heading (e.g. "Not recommended with Shoulder Impingement").
-   - "description" (string): Clinical explanation of what position or load strains what joint/capsule, and who should avoid or exercise caution.
-   - "conditions" (array of strings): Specific contraindication condition names (e.g. ["Shoulder Impingement", "Rotator Cuff Tear"]).
+   - "description" (string): 1 to 2 concise clinical sentences explaining the joint stress or contraindication.
+   - "conditions" (array of strings): 3 to 4 specific condition names (e.g. ["Shoulder Impingement", "Rotator Cuff Tear"]).
 5. Detail the "targetMuscles":
    - "primaryFocus": An object with:
        - "name" (string): Common muscle name (e.g. "Mid Chest", "Upper Chest", "Lats", "Quadriceps").
        - "anatomicalName" (string): Formal medical/anatomical name (e.g. "Pectoralis Major (Sternal Head)", "Latissimus Dorsi").
-   - "secondaryFocus" (array of strings): Secondary muscles and stabilizers recruited (e.g. ["Front Shoulders", "Triceps", "Core & Lats"]).
+   - "secondaryFocus" (array of strings): 2 to 3 secondary muscles and stabilizers recruited (e.g. ["Front Shoulders", "Triceps Brachii", "Core"]).
 6. Provide "stepByStepInstructions" (array of 3 to 4 sequential step objects):
    For each step:
    - "stepNumber" (number: 1, 2, 3, 4...).
-   - "title" (string: concise step action name, e.g. "Set Your Base & Grip", "Unrack and Stabilize", "Controlled Descent", "Drive & Lockout").
-   - "description" (string: precise execution details).
-   - "tip" (string: coach tip / pro-cue, e.g. "Retract your shoulder blades and pinch them firmly into the bench.").
-7. Provide "commonMistakesAndCorrections" (array of 2 to 3 mistake objects):
+   - "title" (string: concise step action name, e.g. "Set Your Base & Grip", "Controlled Descent").
+   - "description" (string: 1 to 2 sentences of execution cues).
+   - "tip" (string: 1 concise coach tip / pro-cue).
+7. Provide "commonMistakesAndCorrections" (array of 2 mistake objects):
    For each mistake:
-   - "avoid" (string: mistake label, e.g. "Bouncing bar off the sternum").
-   - "fix" (string: actionable solution, e.g. "Pause for half a second at the chest before pressing.").
-   - "why" (string: biomechanical rationale, e.g. "Bouncing uses momentum instead of muscle tension and can bruise cartilage or ribs.").
+   - "avoid" (string: concise mistake label).
+   - "fix" (string: concise actionable solution).
+   - "why" (string: 1 concise sentence of biomechanical reason).
 8. Provide "breathingPattern" (string):
-   Exact inhalation and exhalation cues during the repetition phases (e.g. "Inhale slowly as you lower the barbell to mid-chest. Exhale powerfully as you press back up.").
+   1 concise sentence with exact inhalation and exhalation cues (e.g. "Inhale slowly as you lower the weight; exhale forcefully as you press upward.").
 9. Calculate realistic exercise metrics for ALL 4 difficulty levels: "Beginner", "Intermediate", "Advanced", and "Athelete".
 For each difficulty level, calculate:
 - "repetition" (number): Repetitions per set.
@@ -207,7 +211,7 @@ Return ONLY a valid JSON object with the exact keys:
                         contents: [{ parts: [{ text: prompt }] }],
                         generationConfig: { responseMimeType: "application/json" }
                     },
-                    { timeout: 15000 }
+                    { timeout: 10000 }
                 );
 
                 const parts = response.data?.candidates?.[0]?.content?.parts || [];
