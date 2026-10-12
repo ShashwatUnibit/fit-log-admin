@@ -28,8 +28,9 @@
 - **Request Body Contract** (`iAdminLoginPayload`):
   ```json
   {
-    "email": "admin@example.com",
-    "password": "StrongPassword123!"
+    "emailId": "admin@fitlog.com",
+    "password": "Admin@12345",
+    "fcmToken": "optional_firebase_cloud_messaging_token"
   }
   ```
 - **Validation**:
@@ -74,7 +75,9 @@
 - **Request Body Contract** (`iAdminAutoLoginPayload`):
   ```json
   {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "userId": "67a3f8...",
+    "password": "Admin@12345",
+    "fcmToken": "optional_firebase_cloud_messaging_token"
   }
   ```
 - **Validation**:
