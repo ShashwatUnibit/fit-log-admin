@@ -16,9 +16,9 @@ export default class AuthSecurity {
     public async validateToken(req: Request, res: Response, next: NextFunction): Promise<Response | null> {
         const authHeader = req.headers.authorization ?? "";
         const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
-        const appId = req.headers[eHeadersKeys.xAppId] ?? "";
-        const appVersion = req.headers[eHeadersKeys.xAppVersion] ?? "";
-        const platform = req.headers[eHeadersKeys.xAppPlatform] ?? "";
+        const appId = (req.headers[eHeadersKeys.xAppId] ?? req.headers["app-id"] ?? "") as string;
+        const appVersion = (req.headers[eHeadersKeys.xAppVersion] ?? req.headers["app-version"] ?? "") as string;
+        const platform = (req.headers[eHeadersKeys.xAppPlatform] ?? req.headers["platform"] ?? "") as string;
 
         // Check for required headers
         if (!appVersion) {
@@ -97,9 +97,9 @@ export default class AuthSecurity {
 
     // eslint-disable-next-line max-params
     public async validateAppId(req: Request, res: Response, next: NextFunction): Promise<null | Response> {
-        const appId = req.headers[eHeadersKeys.xAppId] ?? "";
-        const appVersion = req.headers[eHeadersKeys.xAppVersion] ?? "";
-        const platform = req.headers[eHeadersKeys.xAppPlatform] ?? "";
+        const appId = (req.headers[eHeadersKeys.xAppId] ?? req.headers["app-id"] ?? "") as string;
+        const appVersion = (req.headers[eHeadersKeys.xAppVersion] ?? req.headers["app-version"] ?? "") as string;
+        const platform = (req.headers[eHeadersKeys.xAppPlatform] ?? req.headers["platform"] ?? "") as string;
 
         // Check for required headers
         if (!appVersion) {
