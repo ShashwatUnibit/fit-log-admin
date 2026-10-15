@@ -29,6 +29,7 @@ const YogaSchema = new Schema<iYoga>(
         propsRequired: { type: [String], default: [] },
         breathingGuidance: { type: String, trim: true, default: "" },
         imageUrl: { type: String, trim: true, default: "" },
+        videoUrl: { type: String, trim: true, default: "" },
         isActive: { type: Boolean, default: true },
         isDeleted: { type: Boolean, default: false },
     },

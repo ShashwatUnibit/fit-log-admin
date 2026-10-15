@@ -25,6 +25,7 @@ export interface iCreateYogaPayload {
     englishName?: string;
     sanskritName?: string;
     imageUrl?: string;
+    videoUrl?: string;
     isActive?: boolean;
 }
 
@@ -49,6 +50,7 @@ export interface iYoga {
     propsRequired?: string[];
     breathingGuidance?: string;
     imageUrl?: string;
+    videoUrl?: string;
     isActive?: boolean;
     isDeleted?: boolean;
     createdAt?: Date;

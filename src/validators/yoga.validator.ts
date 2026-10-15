@@ -17,6 +17,7 @@ export default class YogaValidator {
             "string.min": `"sanskritName" must have at least 1 character`,
         }),
         imageUrl: Joi.string().trim().optional().allow(""),
+        videoUrl: Joi.string().trim().optional().allow(""),
         isActive: Joi.boolean().optional(),
     })
         .or("englishName", "sanskritName")

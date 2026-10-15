@@ -73,6 +73,7 @@ export default class YogaController {
                 propsRequired: aiYoga.propsRequired,
                 breathingGuidance: aiYoga.breathingGuidance,
                 imageUrl: payload.imageUrl ? payload.imageUrl.trim() : "",
+                videoUrl: payload.videoUrl ? payload.videoUrl.trim() : "",
                 isActive: payload.isActive !== undefined ? payload.isActive : true,
                 isDeleted: false,
             });

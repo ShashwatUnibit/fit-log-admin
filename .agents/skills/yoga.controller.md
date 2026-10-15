@@ -31,6 +31,7 @@
     "englishName": "Downward-Facing Dog",
     "sanskritName": "Adho Mukha Svanasana",
     "imageUrl": "https://assets.fitlog.com/yoga/downward-dog.png",
+    "videoUrl": "https://assets.fitlog.com/yoga/downward-dog.mp4",
     "isActive": true
   }
   ```
