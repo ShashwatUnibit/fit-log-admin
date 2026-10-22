@@ -1,0 +1,12 @@
+# Project Facts
+- Language: TypeScript (strict mode, ES2023)
+- Module System: ESM (NodeNext)
+- Framework: Express 5 (5.2.1)
+- DB and ORM/ODM: MongoDB via Mongoose (9.2.4), Redis (6.0.0)
+- Validation Library: Joi (18.0.2), @joi/date (2.1.1)
+- Test Runner: unknown
+- Lint Command: npx eslint .
+- Typecheck Command: npx tsc --noEmit
+- Test Command: unknown
+- Build Command: npm run build
+- Package Manager: npm (package-lock.json)

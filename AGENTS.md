@@ -1,77 +1,23 @@
-# FitLog Admin Backend - AI Agent Guidelines & Context
+# Shared Rules
 
-## Project Overview
-`fit_log_admin` is an administrative and core service backend for the **FitLog** platform. It provides RESTful APIs for managing fitness resources, exercise databases, workout plans, nutrition & dietary constraints (food preferences, allergies, intolerances, dietary restrictions), and AI-driven workout plan generation using LangChain and Google GenAI.
+## Quality bar (applies to every agent)
+- Code must pass the project's lint, typecheck and tests before an agent reports "done".
+- Never claim something works unless you ran it. If you could not verify, say "unverified" and why.
+- Never invent API fields, endpoints, env vars or library functions. Check real responses, docs or the installed package source. Unknown field = mark optional and flag it.
+- No dead code, no TODO placeholders, no console.log (use the project logger), no secrets in code or logs.
+- Validate all external input at the boundary. Handle errors explicitly; never swallow them. Use consistent error format and HTTP status codes.
+- Async code: always await or return promises, handle rejections, set timeouts on outbound calls.
+- Prefer small diffs: edit the necessary lines, do not rewrite whole files.
 
-## Tech Stack
-- **Runtime**: Node.js 20+
-- **Language**: TypeScript (strict mode, ES modules / CommonJS bundled with `esbuild` and executed via `tsx` / `nodemon`)
-- **Web Framework**: Express 5 (`express@^5.2.1`)
-- **Database**: MongoDB via Mongoose 9 (`mongoose@^9.2.4`)
-- **Caching / Session Storage**: Redis 6 (`redis@^6.0.0`)
-- **AI / LLM Integration**: LangChain (`@langchain/core`, `@langchain/google-genai`, `@langchain/langgraph`, `@openrouter/sdk`)
-- **Validation**: Joi (`joi`, `@joi/date`)
-- **Security & Crypto**: `crypto-js`, `jsonwebtoken`, `mongo-sanitize`
-- **Build Tools**: `tsx`, `esbuild`, `typescript`
+## Token and time discipline
+- Read only the files listed in your role's Inputs plus the handoff folder for the current feature. Use search/grep to locate code; do not open whole directories or large files.
+- Do not paste large file contents, logs or stack traces into messages. Quote the relevant 5-10 lines.
+- Run scoped checks (single test file, changed files only) while working; run the full suite only at the Reviewer stage.
+- Each agent reports in 10 lines or fewer using the handoff template.
+- If a fix fails twice, stop, write what you tried and what you suspect, and hand back to the Orchestrator. Do not loop.
+- Plan briefly first, then implement. No long explanations after the work is done.
 
-## Workspace Structure
-```
-fit_log_admin/
-├── .agents/                    # Antigravity agent configurations
-│   ├── rules/                  # Project rules and conventions
-│   └── skills/                 # Custom skills (e.g., workspace-helper)
-├── build/                      # Bundled production distribution
-├── src/
-│   ├── consts/                 # Static values, env configurations, regex
-│   ├── controllers/            # Request handlers (Singleton pattern)
-│   ├── db/
-│   │   ├── mongo/              # Mongoose schemas, models, and DB connector
-│   │   └── redis/              # Redis client, partitions, and cache operations
-│   ├── enums/                  # System, HTTP, and domain-level enums
-│   ├── interfaces/             # TypeScript data contracts & request/response shapes
-│   ├── middlewares/            # Express middlewares
-│   ├── modules/                # Feature-specific modules / sub-services
-│   ├── routes/                 # Express route definitions (Singleton pattern)
-│   ├── scripts/                # Utility and database migration/seed scripts
-│   ├── security/               # App ID validation, JWT auth, encryption
-│   ├── services/               # Core business logic, LangChain AI services, cron
-│   ├── types/                  # Additional TypeScript type definitions
-│   ├── utils/                  # Helper utilities, logger, response wrappers
-│   ├── validators/             # Joi validation schemas
-│   └── index.ts                # Application entrypoint & server bootstrap
-├── package.json
-└── tsconfig.json
-```
-
-## Architectural Patterns & Conventions
-1. **Singleton Pattern**:
-   - Controllers, routes, services, and security managers follow the singleton pattern:
-     ```typescript
-     export default class ExerciseController {
-         private static _instance: ExerciseController;
-         public static get instance(): ExerciseController {
-             if (!this._instance) {
-                 this._instance = new ExerciseController();
-             }
-             return this._instance;
-         }
-     }
-     ```
-2. **API Routes & Security**:
-   - All `/api/v1/*` routes pass through `AuthSecurity.instance.validateAppId`:
-     ```typescript
-     app.use("/api/v1/exercise", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), ExerciseRoute.instance.router);
-     ```
-   - Request encryption / decryption is managed via `EncryptionSecurity.instance.onRequest`.
-3. **Uniform Response Contract**:
-   - Responses follow the `iResponse` interface using `eHttpStatusCode` and `eResponseStatus`.
-4. **Environment Variables**:
-   - All runtime configurations must be declared and accessed through `cEnv` in `src/consts/env.const.ts`.
-5. **Linting & Code Quality**:
-   - TypeScript ESLint flat configuration is in `eslint.config.mts`.
-   - Adhere to existing naming conventions (e.g., `c` prefix for consts, `e` prefix for enums, `i` prefix for interfaces).
-
-## Running and Building
-- **Development**: `npm run dev` (runs `nodemon --exec tsx src/index.ts`)
-- **Type Checking & Build**: `npm run build` (`tsc --noEmit && esbuild src/index.ts ...`)
-- **Production Execution**: `npm start` (`node build/index.js`)
+## Boundaries
+- Each agent writes only to the paths in its Outputs. If another agent's file needs a change, request it in the handoff; do not edit it yourself.
+- Agents communicate only through .agents/handoff/<feature>/ (spec.md, contract.md, status.md). Do not rely on chat memory.
+- Never run destructive commands (drop DB, force push, delete migrations, rm -rf) without my explicit approval.
