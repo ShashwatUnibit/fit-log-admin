@@ -1,5 +1,6 @@
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
+import cors from "cors";
 import { cEnv } from "./consts/env.const";
 import { eHttpStatusCode, eResponseStatus } from "./enums/server.enum";
 import { iResponse } from "./interfaces/response.interface";
@@ -28,9 +29,35 @@ MongoDB.instance.connect().catch((error) => {
 CronJobsService.instance.initializeCronJobs();
 
 const app = express();
+
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+        "Origin",
+        "X-Requested-With",
+        "Content-Type",
+        "Accept",
+        "Authorization",
+        "app-id",
+        "x-app-id",
+        "app-version",
+        "x-app-version",
+        "platform",
+        "x-app-platform",
+        "hash",
+        "x-access-token",
+        "app-type",
+        "x-user-id",
+        "x-session-id",
+        "x-server-key",
+    ],
+    exposedHeaders: ["x-access-token", "Authorization"],
+    optionsSuccessStatus: 200,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, max-params
 app.use((err: any, req: Request, res: Response, next: NextFunction): Response | null => {
@@ -47,16 +74,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction): Response | 
 
 // eslint-disable-next-line max-params
 app.use((req, res, next) => EncryptionSecurity.instance.onRequest(req, res, next));
-
-
-// eslint-disable-next-line max-params
-app.use((req: Request, res: Response, next: NextFunction): void => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,app-id,Authorization,platform,app-version,hash,x-access-token,app-type");
-    res.header("Access-Control-Expose-Headers", "x-access-token,Authorization");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH");
-    next();
-});
 
 // Routes
 app.use("/api/v1/auth", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), AuthRoute.instance.router);

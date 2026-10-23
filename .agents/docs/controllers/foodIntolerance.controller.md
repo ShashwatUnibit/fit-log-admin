@@ -1,13 +1,13 @@
 # Food Intolerance Controller (`FoodIntoleranceController`)
 
-**Source File**: [foodIntolerance.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/foodIntolerance.controller.ts)  
-**Route File**: [foodIntolerance.route.ts](file:///d:/Backend/fit_log_admin/src/routes/foodIntolerance.route.ts)  
+**Source File**: [foodIntolerance.controller.ts](../../../src/controllers/foodIntolerance.controller.ts)  
+**Route File**: [foodIntolerance.route.ts](../../../src/routes/foodIntolerance.route.ts)  
 **Base Path**: `/api/v1/food-intolerance`  
 **Pattern**: Singleton (`FoodIntoleranceController.instance`)  
-**Database Model**: `FoodIntoleranceDb` in [foodIntolerance.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/foodIntolerance.mongo.ts)  
+**Database Model**: `FoodIntoleranceDb` in [foodIntolerance.mongo.ts](../../../src/db/mongo/foodIntolerance.mongo.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -33,7 +33,7 @@
   }
   ```
 - **Validation**:
-  - Handled by `FoodIntoleranceValidator.instance.createSchema` in [foodIntolerance.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/foodIntolerance.validator.ts).
+  - Handled by `FoodIntoleranceValidator.instance.createSchema` in [foodIntolerance.validator.ts](../../../src/validators/foodIntolerance.validator.ts).
   - Validates required strings for `title`, `subtitle`, and `imageUrl`.
 - **Business Logic & Persistence**:
   1. Validates incoming payload with Joi schema; rejects with `400 BAD_REQUEST` if invalid.

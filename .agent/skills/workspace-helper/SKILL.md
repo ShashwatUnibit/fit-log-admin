@@ -12,4 +12,4 @@ description: Provides custom conventions and workflows for managing this specifi
 ## How to use it
 - Always double-check existing folder trees before proposing file additions.
 - Adhere strictly to the workspace conventions established in this project.
-- Reference controller guides in `.agents/skills/*.controller.md` and the `controllers-guide` skill when working with API handlers, business rules, or validation contracts.
+- Reference controller guides in `.agents/docs/controllers/*.controller.md` and the `controllers-guide` skill when working with API handlers, business rules, or validation contracts.

@@ -1,13 +1,13 @@
 # Dietary Restriction Controller (`DietaryRestrictionController`)
 
-**Source File**: [dietaryRestriction.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/dietaryRestriction.controller.ts)  
-**Route File**: [dietaryRestriction.route.ts](file:///d:/Backend/fit_log_admin/src/routes/dietaryRestriction.route.ts)  
+**Source File**: [dietaryRestriction.controller.ts](../../../src/controllers/dietaryRestriction.controller.ts)  
+**Route File**: [dietaryRestriction.route.ts](../../../src/routes/dietaryRestriction.route.ts)  
 **Base Path**: `/api/v1/dietary-restriction`  
 **Pattern**: Singleton (`DietaryRestrictionController.instance`)  
-**Database Model**: `DietaryRestrictionDb` in [dietaryRestriction.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/dietaryRestriction.mongo.ts)  
+**Database Model**: `DietaryRestrictionDb` in [dietaryRestriction.mongo.ts](../../../src/db/mongo/dietaryRestriction.mongo.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -33,7 +33,7 @@
   }
   ```
 - **Validation**:
-  - Handled by `DietaryRestrictionValidator.instance.createSchema` in [dietaryRestriction.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/dietaryRestriction.validator.ts).
+  - Handled by `DietaryRestrictionValidator.instance.createSchema` in [dietaryRestriction.validator.ts](../../../src/validators/dietaryRestriction.validator.ts).
   - Validates required strings for `title`, `subtitle`, and `imageUrl`.
 - **Business Logic & Persistence**:
   1. Validates body against Joi schema; returns `400 BAD_REQUEST` with validation message if invalid.

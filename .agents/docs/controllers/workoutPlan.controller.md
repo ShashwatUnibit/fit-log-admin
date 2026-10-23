@@ -1,13 +1,13 @@
 # Workout Plan Controller (`WorkoutPlanController`)
 
-**Source File**: [workoutPlan.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/workoutPlan.controller.ts)  
-**Route File**: [workoutPlan.route.ts](file:///d:/Backend/fit_log_admin/src/routes/workoutPlan.route.ts)  
+**Source File**: [workoutPlan.controller.ts](../../../src/controllers/workoutPlan.controller.ts)  
+**Route File**: [workoutPlan.route.ts](../../../src/routes/workoutPlan.route.ts)  
 **Base Path**: `/api/v1/workout-plan`  
 **Pattern**: Singleton (`WorkoutPlanController.instance`)  
-**Database Model**: `WorkoutPlanDb` in [workoutPlan.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/workoutPlan.mongo.ts)  
+**Database Model**: `WorkoutPlanDb` in [workoutPlan.mongo.ts](../../../src/db/mongo/workoutPlan.mongo.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -69,7 +69,7 @@ When creating or modifying workout plans, the controller enforces four critical 
   }
   ```
 - **Validation**:
-  - Handled by `WorkoutPlanValidator.instance.createSchema` in [workoutPlan.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/workoutPlan.validator.ts).
+  - Handled by `WorkoutPlanValidator.instance.createSchema` in [workoutPlan.validator.ts](../../../src/validators/workoutPlan.validator.ts).
 - **Business Logic Steps**:
   1. Validates body schema (returns `400 BAD_REQUEST` on error).
   2. Duplicate name check via case-insensitive regex against `WorkoutPlanDb`.

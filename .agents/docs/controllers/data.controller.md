@@ -1,12 +1,12 @@
 # Data Controller (`DataController`)
 
-**Source File**: [data.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/data.controller.ts)  
-**Route File**: [data.route.ts](file:///d:/Backend/fit_log_admin/src/routes/data.route.ts)  
+**Source File**: [data.controller.ts](../../../src/controllers/data.controller.ts)  
+**Route File**: [data.route.ts](../../../src/routes/data.route.ts)  
 **Base Path**: `/api/v1/data`  
 **Pattern**: Singleton (`DataController.instance`)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -25,7 +25,7 @@
 - **Query Parameters**:
   - `amount`: number/string (validated through Joi schema).
 - **Validation**:
-  - Handled by `DataValidator.instance.sampleSchema` in [data.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/data.validator.ts).
+  - Handled by `DataValidator.instance.sampleSchema` in [data.validator.ts](../../../src/validators/data.validator.ts).
 - **Business Logic**:
   1. Validates `req.query` with Joi. Returns `400 BAD_REQUEST` if invalid.
   2. Extracts `{ amount }` and echoes it back in the success envelope.
@@ -51,13 +51,13 @@
   - Eliminates frontend hardcoding and guarantees consistent enum values across the mobile app, admin panel, and backend services.
 - **Request Parameters / Body**: None.
 - **Data Contract (`iStaticData`)**:
-  - `foodPreferences`: All values from `eFoodPreferences` ([foodItems.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/foodItems.enum.ts))
-  - `foodAllergies`: All values from `eFoodAllergies` ([foodItems.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/foodItems.enum.ts))
-  - `foodIntolerance`: All values from `eFoodIntolerances` ([foodItems.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/foodItems.enum.ts))
-  - `dietaryRestrictions`: All values from `eDietaryRestrictions` ([foodItems.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/foodItems.enum.ts))
-  - `focusPart`: All values from `eFocusPart` ([exercise.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/exercise.enum.ts))
-  - `exerciseLevel`: All values from `eExerciseLevel` ([exercise.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/exercise.enum.ts))
-  - `exerciseType`: All values from `eExerciseType` ([exercise.enum.ts](file:///d:/Backend/fit_log_admin/src/enums/exercise.enum.ts))
+  - `foodPreferences`: All values from `eFoodPreferences` ([foodItems.enum.ts](../../../src/enums/foodItems.enum.ts))
+  - `foodAllergies`: All values from `eFoodAllergies` ([foodItems.enum.ts](../../../src/enums/foodItems.enum.ts))
+  - `foodIntolerance`: All values from `eFoodIntolerances` ([foodItems.enum.ts](../../../src/enums/foodItems.enum.ts))
+  - `dietaryRestrictions`: All values from `eDietaryRestrictions` ([foodItems.enum.ts](../../../src/enums/foodItems.enum.ts))
+  - `focusPart`: All values from `eFocusPart` ([exercise.enum.ts](../../../src/enums/exercise.enum.ts))
+  - `exerciseLevel`: All values from `eExerciseLevel` ([exercise.enum.ts](../../../src/enums/exercise.enum.ts))
+  - `exerciseType`: All values from `eExerciseType` ([exercise.enum.ts](../../../src/enums/exercise.enum.ts))
 - **Response Shape** (`iResponse`):
   ```json
   {

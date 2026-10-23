@@ -1,13 +1,13 @@
 # Food Allergy Controller (`FoodAllergyController`)
 
-**Source File**: [foodAllergy.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/foodAllergy.controller.ts)  
-**Route File**: [foodAllergy.route.ts](file:///d:/Backend/fit_log_admin/src/routes/foodAllergy.route.ts)  
+**Source File**: [foodAllergy.controller.ts](../../../src/controllers/foodAllergy.controller.ts)  
+**Route File**: [foodAllergy.route.ts](../../../src/routes/foodAllergy.route.ts)  
 **Base Path**: `/api/v1/food-allergy`  
 **Pattern**: Singleton (`FoodAllergyController.instance`)  
-**Database Model**: `FoodAllergyDb` in [foodAllergy.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/foodAllergy.mongo.ts)  
+**Database Model**: `FoodAllergyDb` in [foodAllergy.mongo.ts](../../../src/db/mongo/foodAllergy.mongo.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -33,7 +33,7 @@
   }
   ```
 - **Validation**:
-  - Handled by `FoodAllergyValidator.instance.createSchema` in [foodAllergy.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/foodAllergy.validator.ts).
+  - Handled by `FoodAllergyValidator.instance.createSchema` in [foodAllergy.validator.ts](../../../src/validators/foodAllergy.validator.ts).
   - Validates required strings for `title`, `subtitle`, and `imageUrl`.
 - **Business Logic & Persistence**:
   1. Validates request body with Joi schema; responds with `400 BAD_REQUEST` if invalid.

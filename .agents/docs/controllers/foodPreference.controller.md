@@ -1,13 +1,13 @@
 # Food Preference Controller (`FoodPreferenceController`)
 
-**Source File**: [foodPreference.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/foodPreference.controller.ts)  
-**Route File**: [foodPreference.route.ts](file:///d:/Backend/fit_log_admin/src/routes/foodPreference.route.ts)  
+**Source File**: [foodPreference.controller.ts](../../../src/controllers/foodPreference.controller.ts)  
+**Route File**: [foodPreference.route.ts](../../../src/routes/foodPreference.route.ts)  
 **Base Path**: `/api/v1/food-preference`  
 **Pattern**: Singleton (`FoodPreferenceController.instance`)  
-**Database Model**: `FoodPreferenceDb` in [foodPreference.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/foodPreference.mongo.ts)  
+**Database Model**: `FoodPreferenceDb` in [foodPreference.mongo.ts](../../../src/db/mongo/foodPreference.mongo.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -33,7 +33,7 @@
   }
   ```
 - **Validation**:
-  - Handled by `FoodPreferenceValidator.instance.createSchema` in [foodPreference.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/foodPreference.validator.ts).
+  - Handled by `FoodPreferenceValidator.instance.createSchema` in [foodPreference.validator.ts](../../../src/validators/foodPreference.validator.ts).
   - Validates required strings for `title`, `subtitle`, and `imageUrl`.
 - **Business Logic & Persistence**:
   1. Validates request body with Joi schema; rejects with `400 BAD_REQUEST` if invalid.

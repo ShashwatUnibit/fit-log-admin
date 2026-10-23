@@ -1,15 +1,15 @@
 ---
 name: controllers-guide
-description: Reference guide for all 9 API controllers in FitLog Admin (auth, data, dietaryRestriction, foodAllergy, foodIntolerance, foodPreference, exercise, workoutPlan, yoga). Outlines routes, methods, business logic, validation, AI generation, and security pipelines.
+description: Index of all 9 API controllers. Read this table first, then open only the one detailed doc you need from .agents/docs/controllers/. Reference guide for all 9 API controllers in FitLog Admin (auth, data, dietaryRestriction, foodAllergy, foodIntolerance, foodPreference, exercise, workoutPlan, yoga). Outlines routes, methods, business logic, validation, AI generation, and security pipelines.
 ---
 
 # FitLog Admin Controllers Guide
 
 This skill provides an authoritative, hallucination-free reference for all API controllers in the `fit_log_admin` backend service.
 
-## Architectural Architecture & Common Middleware
+## Architecture & Common Middleware
 
-All controllers follow the **Singleton pattern** (`ControllerClass.instance`), expose express request handlers, and are mounted onto the application router in [src/index.ts](file:///d:/Backend/fit_log_admin/src/index.ts) under `/api/v1/*`.
+All controllers follow the **Singleton pattern** (`ControllerClass.instance`), expose express request handlers, and are mounted onto the application router in [src/index.ts](../../../src/index.ts) under `/api/v1/*`.
 
 ### Global Pipeline:
 1. **App ID Authentication**: All routes enforce `AuthSecurity.instance.validateAppId` to ensure calls originate from authorized clients.
@@ -23,18 +23,18 @@ All controllers follow the **Singleton pattern** (`ControllerClass.instance`), e
 
 | Controller | Base Route | Key Methods | Description | Detailed Reference |
 | :--- | :--- | :--- | :--- | :--- |
-| **AuthController** | `/api/v1/auth` | `adminLogin`, `adminAutoLogin` | Admin credentials verification, JWT token issuance, session resumption | [auth.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/auth.controller.md) |
-| **DataController** | `/api/v1/data` | `getData`, `getStaticData` | Diagnostic query echo, master system enums (food preferences, allergies, exercise enums) | [data.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/data.controller.md) |
-| **DietaryRestrictionController** | `/api/v1/dietary-restriction` | `createDietaryRestriction` | Adds dietary constraints (Halal, Kosher, Vegan) with duplicate prevention | [dietaryRestriction.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/dietaryRestriction.controller.md) |
-| **FoodAllergyController** | `/api/v1/food-allergy` | `createFoodAllergy` | Registers true clinical food allergies (Peanuts, Shellfish) | [foodAllergy.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/foodAllergy.controller.md) |
-| **FoodIntoleranceController** | `/api/v1/food-intolerance` | `createFoodIntolerance` | Registers digestive intolerances (Lactose, Gluten, Histamine) | [foodIntolerance.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/foodIntolerance.controller.md) |
-| **FoodPreferenceController** | `/api/v1/food-preference` | `createFoodPreference` | Manages elective dietary lifestyles (Mediterranean, Keto, Paleo) | [foodPreference.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/foodPreference.controller.md) |
-| **ExerciseController** | `/api/v1/exercise` | `createExercise`, `getExercises` | AI-assisted exercise creation (Gemini GenAI), 3-tier difficulty levels, listing & filter | [exercise.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/exercise.controller.md) |
-| **WorkoutPlanController** | `/api/v1/workout-plan` | `createWorkoutPlan`, `getWorkoutPlans`, `getWorkoutPlanById`, `getWorkoutPlanByExerciseFor`, `toggleWorkoutPlanStatus`, `deleteWorkoutPlan` | Multi-exercise workout plans, strict single plan per target focus, aggregated metrics | [workoutPlan.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/workoutPlan.controller.md) |
-| **YogaController** | `/api/v1/yoga` | `createYoga`, `getYogas`, `getYogaById` | Gemini AI-generated posture profiles, Sanskrit phonetics, benefits, steps, fuzzy search | [yoga.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/yoga.controller.md) |
+| **AuthController** | `/api/v1/auth` | `adminLogin`, `adminAutoLogin` | Admin credentials verification, JWT token issuance, session resumption | [auth.controller.md](../../docs/controllers/auth.controller.md) |
+| **DataController** | `/api/v1/data` | `getData`, `getStaticData` | Diagnostic query echo, master system enums (food preferences, allergies, exercise enums) | [data.controller.md](../../docs/controllers/data.controller.md) |
+| **DietaryRestrictionController** | `/api/v1/dietary-restriction` | `createDietaryRestriction` | Adds dietary constraints (Halal, Kosher, Vegan) with duplicate prevention | [dietaryRestriction.controller.md](../../docs/controllers/dietaryRestriction.controller.md) |
+| **FoodAllergyController** | `/api/v1/food-allergy` | `createFoodAllergy` | Registers true clinical food allergies (Peanuts, Shellfish) | [foodAllergy.controller.md](../../docs/controllers/foodAllergy.controller.md) |
+| **FoodIntoleranceController** | `/api/v1/food-intolerance` | `createFoodIntolerance` | Registers digestive intolerances (Lactose, Gluten, Histamine) | [foodIntolerance.controller.md](../../docs/controllers/foodIntolerance.controller.md) |
+| **FoodPreferenceController** | `/api/v1/food-preference` | `createFoodPreference` | Manages elective dietary lifestyles (Mediterranean, Keto, Paleo) | [foodPreference.controller.md](../../docs/controllers/foodPreference.controller.md) |
+| **ExerciseController** | `/api/v1/exercise` | `createExercise`, `getExercises`, `getExerciseById` | AI-assisted exercise creation (Gemini GenAI), 4-tier difficulty levels, listing & filter | [exercise.controller.md](../../docs/controllers/exercise.controller.md) |
+| **WorkoutPlanController** | `/api/v1/workout-plan` | `createWorkoutPlan`, `getWorkoutPlans`, `getWorkoutPlanById`, `getWorkoutPlanByExerciseFor`, `toggleWorkoutPlanStatus`, `deleteWorkoutPlan` | Multi-exercise workout plans, strict single plan per target focus, aggregated metrics | [workoutPlan.controller.md](../../docs/controllers/workoutPlan.controller.md) |
+| **YogaController** | `/api/v1/yoga` | `createYoga`, `getYogas`, `getYogaById` | Gemini AI-generated posture profiles, Sanskrit phonetics, benefits, steps, fuzzy search | [yoga.controller.md](../../docs/controllers/yoga.controller.md) |
 
 ---
 
 ## When to Consult These Documents
 - When adding, updating, or reviewing routes, always check the corresponding `.md` file to maintain consistency in schema validation, duplicate detection, and encryption formatting.
-- When generating AI prompts or LangChain pipelines, refer to [exercise.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/exercise.controller.md) and [yoga.controller.md](file:///d:/Backend/fit_log_admin/.agents/skills/yoga.controller.md) for data schemas generated by `GeminiService`.
+- When generating AI prompts or LangChain pipelines, refer to [exercise.controller.md](../../docs/controllers/exercise.controller.md) and [yoga.controller.md](../../docs/controllers/yoga.controller.md) for data schemas generated by `GeminiService`.

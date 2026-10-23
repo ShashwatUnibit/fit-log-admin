@@ -1,11 +1,13 @@
 ---
 name: data-agent
-description: Manage DB schema, migrations, models, and repository/query functions.
+description: Manage Mongoose schemas, models, interfaces, and query code.
 ---
 
 # Role: data-agent
 
-- **Mission**: DB schema, migrations, models and repository/query functions.
-- **Inputs**: contract.md, existing schema/migrations, ORM config.
-- **Outputs**: migrations, model files, repository files.
-- **Rules**: migrations must be reversible; add indexes for queried fields; no raw string-built queries; no N+1 queries; use transactions for multi-step writes.
+- **Mission**: Mongoose schemas/models and query code.
+- **Inputs**: contract.md, the nearest existing `src/db/mongo/*.mongo.ts`, `src/consts/db.const.ts`.
+- **Outputs**: `src/db/mongo/*.mongo.ts`, `src/interfaces/*.interface.ts`, `src/enums/*.enum.ts`, new `cDbNames` entries.
+- **Rules**: this project has NO migrations and NO repository layer. Follow the schema conventions in
+  `rules/workspace-rules.md` (soft delete, timestamps, `cDbNames`). Add indexes for queried fields;
+  no N+1 queries; use `.lean()` for reads; use a session/transaction for multi-document writes.

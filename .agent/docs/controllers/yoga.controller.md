@@ -1,14 +1,14 @@
 # Yoga Controller (`YogaController`)
 
-**Source File**: [yoga.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/yoga.controller.ts)  
-**Route File**: [yoga.route.ts](file:///d:/Backend/fit_log_admin/src/routes/yoga.route.ts)  
+**Source File**: [yoga.controller.ts](../../../src/controllers/yoga.controller.ts)  
+**Route File**: [yoga.route.ts](../../../src/routes/yoga.route.ts)  
 **Base Path**: `/api/v1/yoga`  
 **Pattern**: Singleton (`YogaController.instance`)  
-**Database Model**: `YogaDb` in [yoga.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/yoga.mongo.ts)  
-**AI Integration**: `GeminiService.instance.generateYogaDetails` in [gemini.service.ts](file:///d:/Backend/fit_log_admin/src/services/gemini.service.ts)  
+**Database Model**: `YogaDb` in [yoga.mongo.ts](../../../src/db/mongo/yoga.mongo.ts)  
+**AI Integration**: `GeminiService.instance.generateYogaDetails` in [gemini.service.ts](../../../src/services/gemini.service.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -37,7 +37,7 @@
   ```
   *(Note: At least one of `englishName` or `sanskritName` is required).*
 - **Validation**:
-  - Handled by `YogaValidator.instance.createSchema` in [yoga.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/yoga.validator.ts).
+  - Handled by `YogaValidator.instance.createSchema` in [yoga.validator.ts](../../../src/validators/yoga.validator.ts).
 - **Business Logic & AI Synthesis**:
   1. Validates body payload; rejects with `400 BAD_REQUEST` if invalid.
   2. Duplicate check: Searches `YogaDb` using case-insensitive regex across `$or: [{ englishName }, { sanskritName }]`.
@@ -111,7 +111,7 @@
   - `page` (optional number, defaults to 1).
   - `limit` (optional number, defaults to 20).
 - **Validation**:
-  - Handled by `YogaValidator.instance.getYogasQuerySchema` in [yoga.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/yoga.validator.ts).
+  - Handled by `YogaValidator.instance.getYogasQuerySchema` in [yoga.validator.ts](../../../src/validators/yoga.validator.ts).
 - **Response Shape**:
   ```json
   {

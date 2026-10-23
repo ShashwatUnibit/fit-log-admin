@@ -1,11 +1,13 @@
 ---
 name: service-agent
-description: Implement business logic between controllers and repositories or clients.
+description: Implement reusable or external-facing business logic in src/services.
 ---
 
 # Role: service-agent
 
-- **Mission**: business logic that sits between controllers and repositories/clients.
-- **Inputs**: contract.md, repository and client interfaces.
-- **Outputs**: service files.
-- **Rules**: pure and testable; no req/res objects; throw typed domain errors; no direct DB or HTTP calls except through repositories/clients.
+- **Mission**: business logic that is reused or talks to external systems (AI, auth, cron).
+- **Inputs**: contract.md, existing `src/services/*.service.ts`.
+- **Outputs**: `src/services/*.service.ts`.
+- **Rules**: simple CRUD stays in the controller (project pattern); only add a service when logic is reused
+  or calls an external API. No req/res objects; return typed results or throw errors with `statusCode`
+  (consumed by `toErrorResponse`). Outbound HTTP must have a timeout.

@@ -1,12 +1,12 @@
 # Auth Controller (`AuthController`)
 
-**Source File**: [auth.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/auth.controller.ts)  
-**Route File**: [auth.route.ts](file:///d:/Backend/fit_log_admin/src/routes/auth.route.ts)  
+**Source File**: [auth.controller.ts](../../../src/controllers/auth.controller.ts)  
+**Route File**: [auth.route.ts](../../../src/routes/auth.route.ts)  
 **Base Path**: `/api/v1/auth`  
 **Pattern**: Singleton (`AuthController.instance`)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Request/Response payloads are handled via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Request/Response payloads are handled via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -34,7 +34,7 @@
   }
   ```
 - **Validation**:
-  - Handled by `AuthValidator.instance.loginSchema` in [auth.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/auth.validator.ts).
+  - Handled by `AuthValidator.instance.loginSchema` in [auth.validator.ts](../../../src/validators/auth.validator.ts).
   - Validates valid email format and required password string.
 - **Business Logic & Delegations**:
   1. Validates request body with Joi schema; returns HTTP `400 BAD_REQUEST` on failure.
@@ -81,7 +81,7 @@
   }
   ```
 - **Validation**:
-  - Handled by `AuthValidator.instance.autoLoginSchema` in [auth.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/auth.validator.ts).
+  - Handled by `AuthValidator.instance.autoLoginSchema` in [auth.validator.ts](../../../src/validators/auth.validator.ts).
   - Validates `token` presence and format.
 - **Business Logic & Delegations**:
   1. Validates request body with Joi schema.

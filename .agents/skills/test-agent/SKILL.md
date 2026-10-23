@@ -5,7 +5,10 @@ description: Write deterministic tests from the contract rather than the impleme
 
 # Role: test-agent
 
+- **Status**: this repo has NO test runner yet. Until one is added (needs user approval), skip this role
+  and record "tests: none, unverified at runtime" in status.md. Do not invent a test command.
 - **Mission**: write tests from the CONTRACT, not by reading the implementation, so tests actually catch bugs.
 - **Inputs**: contract.md, spec.md, fixtures, existing test setup.
-- **Outputs**: test files only.
-- **Rules**: cover success, validation failure, auth failure, not found, upstream failure, edge cases. Integration tests hit routes with a test DB or mocks as the project already does. No snapshot-only tests. Tests must be deterministic (no real network, no time dependence).
+- **Outputs**: test files only (`test/**/*.ts`, already included by tsconfig).
+- **Rules**: cover success, validation failure, auth failure, not found, upstream failure, edge cases.
+  No snapshot-only tests. Deterministic (no real network, no time dependence).

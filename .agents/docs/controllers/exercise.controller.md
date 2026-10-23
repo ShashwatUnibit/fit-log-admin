@@ -1,14 +1,14 @@
 # Exercise Controller (`ExerciseController`)
 
-**Source File**: [exercise.controller.ts](file:///d:/Backend/fit_log_admin/src/controllers/exercise.controller.ts)  
-**Route File**: [exercise.route.ts](file:///d:/Backend/fit_log_admin/src/routes/exercise.route.ts)  
+**Source File**: [exercise.controller.ts](../../../src/controllers/exercise.controller.ts)  
+**Route File**: [exercise.route.ts](../../../src/routes/exercise.route.ts)  
 **Base Path**: `/api/v1/exercise`  
 **Pattern**: Singleton (`ExerciseController.instance`)  
-**Database Model**: `ExerciseDb` in [exercise.mongo.ts](file:///d:/Backend/fit_log_admin/src/db/mongo/exercise.mongo.ts)  
-**AI Integration**: `GeminiService.instance.generateExerciseMetrics` in [gemini.service.ts](file:///d:/Backend/fit_log_admin/src/services/gemini.service.ts)  
+**Database Model**: `ExerciseDb` in [exercise.mongo.ts](../../../src/db/mongo/exercise.mongo.ts)  
+**AI Integration**: `GeminiService.instance.generateExerciseMetrics` in [gemini.service.ts](../../../src/services/gemini.service.ts)  
 **Security & Middlewares**:
 - Registered under `AuthSecurity.instance.validateAppId` (requires valid `app-id` in request headers).
-- Responses encrypted via [EncryptionSecurity](file:///d:/Backend/fit_log_admin/src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
+- Responses encrypted via [EncryptionSecurity](../../../src/security/encryption.security.ts) (`EncryptionSecurity.instance.onResponse`).
 
 ---
 
@@ -56,7 +56,7 @@
   ```
   *(Note: Admins can optionally override or provide custom `equipmentRequired`, `exerciseType`, `healthProfilePrecaution`, `targetMuscles`, `stepByStepInstructions`, `commonMistakesAndCorrections`, `breathingPattern`, or `levels`. Any omitted fields are generated automatically by Gemini AI).*
 - **Validation**:
-  - Handled by `ExerciseValidator.instance.createSchema` in [exercise.validator.ts](file:///d:/Backend/fit_log_admin/src/validators/exercise.validator.ts).
+  - Handled by `ExerciseValidator.instance.createSchema` in [exercise.validator.ts](../../../src/validators/exercise.validator.ts).
 - **Business Logic & AI Workflow**:
   1. Validates input schema (`400 BAD_REQUEST` on Joi error).
   2. Duplicate check: searches `ExerciseDb` for `{ name: payload.name.trim(), isDeleted: false }`.

@@ -73,6 +73,11 @@ export default class EncryptionSecurity {
 
     // eslint-disable-next-line max-params
     public onRequest(req: Request, res: Response, next: NextFunction): Response | null {
+        if (req.method === "OPTIONS") {
+            next();
+            return null;
+        }
+
         if (this.isEncBypassedReq(req, true)) {
             next();
             return null;

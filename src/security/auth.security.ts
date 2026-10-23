@@ -14,6 +14,11 @@ export default class AuthSecurity {
 
     // eslint-disable-next-line max-params
     public async validateToken(req: Request, res: Response, next: NextFunction): Promise<Response | null> {
+        if (req.method === "OPTIONS") {
+            next();
+            return null;
+        }
+
         const authHeader = req.headers.authorization ?? "";
         const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
         const appId = (req.headers[eHeadersKeys.xAppId] ?? req.headers["app-id"] ?? "") as string;
@@ -97,6 +102,11 @@ export default class AuthSecurity {
 
     // eslint-disable-next-line max-params
     public async validateAppId(req: Request, res: Response, next: NextFunction): Promise<null | Response> {
+        if (req.method === "OPTIONS") {
+            next();
+            return null;
+        }
+
         const appId = (req.headers[eHeadersKeys.xAppId] ?? req.headers["app-id"] ?? "") as string;
         const appVersion = (req.headers[eHeadersKeys.xAppVersion] ?? req.headers["app-version"] ?? "") as string;
         const platform = (req.headers[eHeadersKeys.xAppPlatform] ?? req.headers["platform"] ?? "") as string;
@@ -140,6 +150,11 @@ export default class AuthSecurity {
 
     // eslint-disable-next-line max-params
     public async validateServerKey(req: Request, res: Response, next: NextFunction): Promise<Response | null> {
+        if (req.method === "OPTIONS") {
+            next();
+            return null;
+        }
+
         const serverKey = req.headers[eHeadersKeys.xServerKey] ?? "";
         if (!serverKey || serverKey !== cEnv.SERVER_S2S_KEY) {
             const responseData: iResponse = {
