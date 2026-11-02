@@ -10,5 +10,8 @@ export const cDbNames = {
     yoga: "yoga" as string,
     users: "users" as string,
     goals: "goals" as string,
+    professions: "professions" as string,
+    // Mongoose lower-cases the user app's "physicalIssues" model name; the collection is "physicalissues".
+    physicalIssues: "physicalissues" as string,
     userWorkoutPlan: "userWorkoutPlans" as string,
 };

@@ -10,5 +10,8 @@ export default class FoodIntoleranceRoute {
 
     private initializeRoutes(): void {
         this.router.post("/create", FoodIntoleranceController.instance.createFoodIntolerance.bind(FoodIntoleranceController.instance));
+        this.router.get("/list", FoodIntoleranceController.instance.getFoodIntoleranceList.bind(FoodIntoleranceController.instance));
+        this.router.patch("/:id", FoodIntoleranceController.instance.updateFoodIntolerance.bind(FoodIntoleranceController.instance));
+        this.router.delete("/:id", FoodIntoleranceController.instance.deleteFoodIntolerance.bind(FoodIntoleranceController.instance));
     }
 }

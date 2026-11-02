@@ -1,9 +1,8 @@
 import { Schema } from "mongoose";
-import { eDietaryRestrictions } from "../enums/foodItems.enum";
 
 export interface iDietaryRestriction {
     _id?: Schema.Types.ObjectId | string;
-    title: eDietaryRestrictions;
+    title: string;
     subtitle: string;
     imageUrl: string;
     isDeleted?: boolean;
@@ -12,7 +11,13 @@ export interface iDietaryRestriction {
 }
 
 export interface iCreateDietaryRestrictionPayload {
-    title: eDietaryRestrictions;
+    title: string;
     subtitle: string;
     imageUrl: string;
+}
+
+export interface iUpdateDietaryRestrictionPayload {
+    title?: string;
+    subtitle?: string;
+    imageUrl?: string;
 }

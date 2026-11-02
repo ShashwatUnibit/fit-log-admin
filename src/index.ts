@@ -19,6 +19,7 @@ import YogaRoute from "./routes/yoga.route";
 import AdminRoute from "./routes/admin.route";
 import DashboardRoute from "./routes/dashboard.route";
 import UserRoute from "./routes/user.route";
+import GoalRoute from "./routes/goal.route";
 import EncryptionSecurity from "./security/encryption.security";
 import AuthSecurity from "./security/auth.security";
 
@@ -74,6 +75,7 @@ app.use("/api/v1/workout-plan", AuthSecurity.instance.validateToken.bind(AuthSec
 app.use("/api/v1/yoga", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), YogaRoute.instance.router);
 app.use("/api/v1/admin", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), AdminRoute.instance.router);
 app.use("/api/v1/dashboard", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), DashboardRoute.instance.router);
+app.use("/api/v1/app", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), GoalRoute.instance.router);
 app.use("/api/v1/users", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), UserRoute.instance.router);
 
 app.use(async (req: Request, res: Response) => {

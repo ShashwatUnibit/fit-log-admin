@@ -1,5 +1,6 @@
 import Joi from "joi";
-import { iUserListQuery, iUserStatusPayload } from "../interfaces/userList.interface";
+import { eUserActionPurpose } from "../enums/userAction.enum";
+import { iUserActionPayload, iUserListQuery, iUserStatusPayload } from "../interfaces/userList.interface";
 import { iWorkoutPlanHistoryQuery } from "../interfaces/workoutPlanHistory.interface";
 
 export default class UserValidator {
@@ -18,6 +19,18 @@ export default class UserValidator {
         isActive: Joi.boolean().strict().required().messages({
             "boolean.base": `"isActive" must be true or false`,
             "any.required": `"isActive" is a required field`,
+        }),
+    }).options({ convert: true, abortEarly: true, allowUnknown: false });
+
+    public userActionSchema = Joi.object<iUserActionPayload>({
+        userId: Joi.string().hex().length(24).required().messages({
+            "string.hex": `"userId" must be a valid user id`,
+            "string.length": `"userId" must be a valid user id`,
+            "any.required": `"userId" is a required field`,
+        }),
+        purpose: Joi.string().valid(...Object.values(eUserActionPurpose)).required().messages({
+            "any.only": `"purpose" must be one of ${Object.values(eUserActionPurpose).join(", ")}`,
+            "any.required": `"purpose" is a required field`,
         }),
     }).options({ convert: true, abortEarly: true, allowUnknown: false });
 

@@ -1,9 +1,8 @@
 import { Schema } from "mongoose";
-import { eFoodIntolerances } from "../enums/foodItems.enum";
 
 export interface iFoodIntolerance {
     _id?: Schema.Types.ObjectId | string;
-    title: eFoodIntolerances;
+    title: string;
     subtitle: string;
     imageUrl: string;
     isDeleted?: boolean;
@@ -12,7 +11,13 @@ export interface iFoodIntolerance {
 }
 
 export interface iCreateFoodIntolerancePayload {
-    title: eFoodIntolerances;
+    title: string;
     subtitle: string;
     imageUrl: string;
+}
+
+export interface iUpdateFoodIntolerancePayload {
+    title?: string;
+    subtitle?: string;
+    imageUrl?: string;
 }

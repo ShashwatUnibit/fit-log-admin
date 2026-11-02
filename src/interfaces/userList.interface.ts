@@ -1,3 +1,5 @@
+import { eUserActionPurpose } from "../enums/userAction.enum";
+
 export type tUserListFilter = "all" | "active" | "inactive" | "premium";
 
 export interface iUserListQuery {
@@ -26,6 +28,11 @@ export interface iUserListItem {
     status: "Active" | "Inactive";
     isRegistrationCompleted: boolean;
     createdAt: Date | null;
+}
+
+export interface iUserActionPayload {
+    userId: string;
+    purpose: eUserActionPurpose;
 }
 
 export interface iUserStatusPayload {

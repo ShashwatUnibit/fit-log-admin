@@ -5,19 +5,28 @@ import FoodAllergyDb from "../db/mongo/foodAllergy.mongo";
 import FoodIntoleranceDb from "../db/mongo/foodIntolerance.mongo";
 import FoodPreferenceDb from "../db/mongo/foodPreference.mongo";
 import GoalDb from "../db/mongo/goals.mongo";
-import { PhysicalIssueDb, ProfessionDb } from "../db/mongo/userProfileRef.mongo";
+import PhysicalIssueDb from "../db/mongo/physicalIssue.mongo";
+import ProfessionDb from "../db/mongo/profession.mongo";
 import UserWorkoutPlanDb from "../db/mongo/userWorkoutPlan.mongo";
 import UserDb from "../db/mongo/users.mongo";
 import { eHttpStatusCode, eResponseStatus } from "../enums/server.enum";
+import { eUserActionPurpose } from "../enums/userAction.enum";
 import { iResponse } from "../interfaces/response.interface";
 import { iUsers } from "../interfaces/user.interface";
 import { iNamedRef, iUserOverview } from "../interfaces/userOverview.interface";
-import { iUserList, iUserListQuery, iUserStatusPayload } from "../interfaces/userList.interface";
+import { iUserActionPayload, iUserList, iUserListQuery, iUserStatusPayload } from "../interfaces/userList.interface";
 import EncryptionSecurity from "../security/encryption.security";
 import { toErrorResponse } from "../utils/common.util";
 import UserValidator from "../validators/user.validator";
 
 const PAGE_LIMIT = 15;
+const USER_ACTIONS: Record<eUserActionPurpose, { update: { isActive?: boolean; isPremium?: boolean; fcmToken?: null }; message: string }> = {
+    [eUserActionPurpose.DEACTIVATE_PROFILE]: { update: { isActive: false }, message: "User profile deactivated successfully" },
+    [eUserActionPurpose.ACTIVATE_PROFILE]: { update: { isActive: true }, message: "User profile activated successfully" },
+    [eUserActionPurpose.GRANT_PREMIUM]: { update: { isPremium: true }, message: "Premium granted successfully" },
+    [eUserActionPurpose.REVOKE_PREMIUM]: { update: { isPremium: false }, message: "Premium revoked successfully" },
+    [eUserActionPurpose.CLEAR_FCM]: { update: { fcmToken: null }, message: "FCM token cleared successfully" },
+};
 const REGEX_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g;
 
 export default class UserController {
@@ -256,6 +265,65 @@ export default class UserController {
             return "Normal";
         }
         return bmi < 30 ? "Overweight" : "Obese";
+    }
+
+    public async performUserAction(req: Request, res: Response): Promise<void> {
+        const bodyResult = UserValidator.instance.userActionSchema.validate(req.body ?? {});
+        if (bodyResult.error) {
+            const responseData: iResponse = {
+                status: eResponseStatus.ERROR,
+                message: bodyResult.error.message,
+                httpCode: eHttpStatusCode.BAD_REQUEST,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+            return;
+        }
+
+        try {
+            const { userId, purpose } = req.body as iUserActionPayload;
+            const action = USER_ACTIONS[purpose];
+            const user = await UserDb.findOneAndUpdate(
+                { _id: userId, isDeleted: { $ne: true } },
+                { $set: action.update },
+                { new: true }
+            ).lean();
+
+            if (!user) {
+                const responseData: iResponse = {
+                    status: eResponseStatus.ERROR,
+                    message: "User not found",
+                    httpCode: eHttpStatusCode.NOT_FOUND,
+                };
+                EncryptionSecurity.instance.onResponse(req, res, responseData);
+                return;
+            }
+
+            const isActive = user.isActive !== false;
+            const isPremium = user.isPremium === true;
+            const responseData: iResponse = {
+                status: eResponseStatus.SUCCESS,
+                message: action.message,
+                httpCode: eHttpStatusCode.OK,
+                data: {
+                    userId: String(user._id),
+                    purpose,
+                    isActive,
+                    status: isActive ? "Active" : "Inactive",
+                    isPremium,
+                    plan: isPremium ? "VIP Premium" : "Free",
+                    hasFcmToken: Boolean(user.fcmToken),
+                },
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+        } catch (err: unknown) {
+            const errorRes = toErrorResponse(err);
+            const responseData: iResponse = {
+                status: eResponseStatus.FAIL,
+                message: errorRes.message ?? "Internal server error",
+                httpCode: errorRes.statusCode || eHttpStatusCode.INTERNAL_SERVER_ERROR,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+        }
     }
 
     private buildFilter(query: iUserListQuery): QueryFilter<iUsers> {

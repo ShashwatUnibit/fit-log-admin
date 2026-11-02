@@ -10,5 +10,8 @@ export default class FoodPreferenceRoute {
 
     private initializeRoutes(): void {
         this.router.post("/create", FoodPreferenceController.instance.createFoodPreference.bind(FoodPreferenceController.instance));
+        this.router.get("/list", FoodPreferenceController.instance.getFoodPreferenceList.bind(FoodPreferenceController.instance));
+        this.router.patch("/:id", FoodPreferenceController.instance.updateFoodPreference.bind(FoodPreferenceController.instance));
+        this.router.delete("/:id", FoodPreferenceController.instance.deleteFoodPreference.bind(FoodPreferenceController.instance));
     }
 }

@@ -11,6 +11,7 @@ export default class UserRoute {
     }
 
     private initializeRoutes(): void {
+        this.router.post("/action", UserController.instance.performUserAction.bind(UserController.instance));
         this.router.get("/list", UserController.instance.getUserList.bind(UserController.instance));
         this.router.get("/:id/overview", UserController.instance.getUserOverview.bind(UserController.instance));
         this.router.get("/:id/workout-plans", UserWorkoutPlanController.instance.getWorkoutPlanHistory.bind(UserWorkoutPlanController.instance));

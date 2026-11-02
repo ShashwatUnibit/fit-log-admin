@@ -1,9 +1,8 @@
 import { Schema } from "mongoose";
-import { eFoodPreferences } from "../enums/foodItems.enum";
 
 export interface iFoodPreference {
     _id?: Schema.Types.ObjectId | string;
-    title: eFoodPreferences;
+    title: string;
     subtitle: string;
     imageUrl: string;
     isDeleted?: boolean;
@@ -12,7 +11,13 @@ export interface iFoodPreference {
 }
 
 export interface iCreateFoodPreferencePayload {
-    title: eFoodPreferences;
+    title: string;
     subtitle: string;
     imageUrl: string;
+}
+
+export interface iUpdateFoodPreferencePayload {
+    title?: string;
+    subtitle?: string;
+    imageUrl?: string;
 }

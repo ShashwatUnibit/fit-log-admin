@@ -10,5 +10,8 @@ export default class DietaryRestrictionRoute {
 
     private initializeRoutes(): void {
         this.router.post("/create", DietaryRestrictionController.instance.createDietaryRestriction.bind(DietaryRestrictionController.instance));
+        this.router.get("/list", DietaryRestrictionController.instance.getDietaryRestrictionList.bind(DietaryRestrictionController.instance));
+        this.router.patch("/:id", DietaryRestrictionController.instance.updateDietaryRestriction.bind(DietaryRestrictionController.instance));
+        this.router.delete("/:id", DietaryRestrictionController.instance.deleteDietaryRestriction.bind(DietaryRestrictionController.instance));
     }
 }
