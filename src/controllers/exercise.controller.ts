@@ -5,10 +5,12 @@ import { iResponse } from "../interfaces/response.interface";
 import EncryptionSecurity from "../security/encryption.security";
 import { toErrorResponse } from "../utils/common.util";
 import ExerciseValidator from "../validators/exercise.validator";
-import { iCreateExercisePayload, iGetExercisesQuery } from "../interfaces/exercise.interface";
+import { iCreateExercisePayload, iGetExercisesQuery, iUpdateExercisePayload } from "../interfaces/exercise.interface";
 import ExerciseDb from "../db/mongo/exercise.mongo";
 import GeminiService from "../services/gemini.service";
 import { eExerciseLevel, eExerciseType, eFocusPart } from "../enums/exercise.enum";
+
+const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export default class ExerciseController {
     public static instance: ExerciseController = new ExerciseController();
@@ -130,7 +132,7 @@ export default class ExerciseController {
         }
 
         try {
-            const { focusPart, exerciseType, exerciseLevel, level, equipmentRequired, totalTimeToComplete, page, limit } =
+            const { search, focusPart, exerciseType, exerciseLevel, level, equipmentRequired, totalTimeToComplete, page, limit } =
                 value as iGetExercisesQuery;
 
             const filterQuery: Record<string, unknown> = { isDeleted: false };
@@ -147,8 +149,19 @@ export default class ExerciseController {
                 filterQuery["levels.level"] = targetLevel;
             }
 
+            const searchText = search?.trim();
+            if (searchText) {
+                const searchRegex = new RegExp(escapeRegex(searchText), "i");
+                filterQuery.$or = [
+                    { name: searchRegex },
+                    { focusPart: searchRegex },
+                    { equipmentRequired: searchRegex },
+                    { exerciseType: searchRegex },
+                ];
+            }
+
             if (equipmentRequired && typeof equipmentRequired === "string" && equipmentRequired.trim().length > 0) {
-                filterQuery.equipmentRequired = { $regex: new RegExp(equipmentRequired.trim(), "i") };
+                filterQuery.equipmentRequired = { $regex: new RegExp(escapeRegex(equipmentRequired.trim()), "i") };
             }
 
             if (totalTimeToComplete && !isNaN(Number(totalTimeToComplete))) {
@@ -281,6 +294,87 @@ export default class ExerciseController {
                 message: "Exercise fetched successfully",
                 httpCode: eHttpStatusCode.OK,
                 data: responsePayload,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+        } catch (err: unknown) {
+            const errorRes = toErrorResponse(err);
+            const responseData: iResponse = {
+                status: eResponseStatus.FAIL,
+                message: errorRes.message ?? "Internal server error",
+                httpCode: errorRes.statusCode || eHttpStatusCode.INTERNAL_SERVER_ERROR,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+        }
+    }
+
+    public async updateExercise(req: Request, res: Response): Promise<void> {
+        const paramsResult = ExerciseValidator.instance.idParamSchema.validate(req.params);
+        const bodyResult = ExerciseValidator.instance.updateSchema.validate(req.body ?? {});
+        const validationError = paramsResult.error ?? bodyResult.error;
+        if (validationError) {
+            const responseData: iResponse = {
+                status: eResponseStatus.ERROR,
+                message: validationError.message,
+                httpCode: eHttpStatusCode.BAD_REQUEST,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+            return;
+        }
+
+        try {
+            const { id } = req.params as { id: string };
+            const { imageUrl, videoUrl, ...rest } = bodyResult.value as iUpdateExercisePayload;
+            const changes: Record<string, unknown> = { ...rest };
+            delete changes.image;
+            delete changes.video;
+
+            const image = rest.image ?? imageUrl;
+            const video = rest.video ?? videoUrl;
+            if (image !== undefined) {
+                changes.image = image;
+            }
+            if (video !== undefined) {
+                changes.video = video;
+            }
+            if (rest.stepByStepInstructions) {
+                changes.stepByStepInstructions = rest.stepByStepInstructions.map((step, index) => ({
+                    ...step,
+                    stepNumber: step.stepNumber ?? index + 1,
+                }));
+            }
+
+            const exercise = await ExerciseDb.findOne({ _id: id, isDeleted: false });
+            if (!exercise) {
+                const responseData: iResponse = {
+                    status: eResponseStatus.ERROR,
+                    message: "Exercise not found",
+                    httpCode: eHttpStatusCode.NOT_FOUND,
+                };
+                EncryptionSecurity.instance.onResponse(req, res, responseData);
+                return;
+            }
+
+            if (rest.name && rest.name !== exercise.name) {
+                const duplicate = await ExerciseDb.exists({ name: rest.name, isDeleted: false, _id: { $ne: id } });
+                if (duplicate) {
+                    const responseData: iResponse = {
+                        status: eResponseStatus.ERROR,
+                        message: "Exercise with this name already exists",
+                        httpCode: eHttpStatusCode.CONFLICT,
+                    };
+                    EncryptionSecurity.instance.onResponse(req, res, responseData);
+                    return;
+                }
+            }
+
+            exercise.set(changes);
+            const updated = await exercise.save();
+
+            const responseData: iResponse = {
+                status: eResponseStatus.SUCCESS,
+                message: "Exercise updated successfully",
+                httpCode: eHttpStatusCode.OK,
+                data: updated.toObject(),
             };
             EncryptionSecurity.instance.onResponse(req, res, responseData);
         } catch (err: unknown) {

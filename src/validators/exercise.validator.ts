@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { eExerciseLevel, eExerciseType, eFocusPart } from "../enums/exercise.enum";
-import { iCreateExercisePayload, iGetExercisesQuery } from "../interfaces/exercise.interface";
+import { iCreateExercisePayload, iGetExercisesQuery, iUpdateExercisePayload } from "../interfaces/exercise.interface";
 
 export default class ExerciseValidator {
     public static instance: ExerciseValidator = new ExerciseValidator();
@@ -74,7 +74,24 @@ export default class ExerciseValidator {
             .optional(),
     }).options({ convert: true, abortEarly: true, allowUnknown: false });
 
+    public idParamSchema = Joi.object<{ id: string }>({
+        id: Joi.string().trim().length(24).hex().required().messages({
+            "string.length": `"id" must be a valid id`,
+            "string.hex": `"id" must be a valid id`,
+            "any.required": `"id" is a required field`,
+        }),
+    }).options({ convert: true, abortEarly: true, allowUnknown: false });
+
+    public updateSchema = this.createSchema
+        .fork(["name", "focusPart"], (schema) => schema.optional())
+        .min(1)
+        .messages({ "object.min": "At least one field to update is required" }) as Joi.ObjectSchema<iUpdateExercisePayload>;
+
     public getExercisesQuerySchema = Joi.object<iGetExercisesQuery>({
+        search: Joi.string().trim().max(100).optional().allow("").messages({
+            "string.base": `"search" should be a type of 'text'`,
+            "string.max": `"search" should have a maximum length of {#limit}`,
+        }),
         focusPart: Joi.string()
             .valid(...Object.values(eFocusPart))
             .optional()

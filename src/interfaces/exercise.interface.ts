@@ -78,7 +78,10 @@ export interface iCreateExercisePayload {
     levels?: iExerciseLevelDetails[];
 }
 
+export type iUpdateExercisePayload = Partial<iCreateExercisePayload>;
+
 export interface iGetExercisesQuery {
+    search?: string;
     focusPart?: eFocusPart;
     exerciseType?: eExerciseType;
     exerciseLevel?: eExerciseLevel;

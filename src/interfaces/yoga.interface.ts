@@ -29,8 +29,27 @@ export interface iCreateYogaPayload {
     isActive?: boolean;
 }
 
+export interface iUpdateYogaPayload {
+    englishName?: string;
+    sanskritName?: string;
+    sanskritNamePhonetic?: string;
+    description?: string;
+    benefits?: string[];
+    instructions?: iYogaInstruction[];
+    defaultHoldDurationSeconds?: number;
+    recommendedRepitition?: number;
+    timeTakenPerRepetition?: number;
+    totalTimeTaken?: number;
+    propsRequired?: string[];
+    breathingGuidance?: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    isActive?: boolean;
+}
+
 export interface iGetYogasQuery {
     search?: string;
+    isActive?: boolean;
     page?: number;
     limit?: number;
 }

@@ -12,6 +12,7 @@ export default class ExerciseRoute {
         this.router.post("/create", ExerciseController.instance.createExercise.bind(ExerciseController.instance));
         this.router.get("/list", ExerciseController.instance.getExercises.bind(ExerciseController.instance));
         this.router.get("/:id", ExerciseController.instance.getExerciseById.bind(ExerciseController.instance));
+        this.router.patch("/:id", ExerciseController.instance.updateExercise.bind(ExerciseController.instance));
     }
 }
 

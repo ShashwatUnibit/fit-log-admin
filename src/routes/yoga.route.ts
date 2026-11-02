@@ -12,5 +12,6 @@ export default class YogaRoute {
         this.router.post("/create", YogaController.instance.createYoga.bind(YogaController.instance));
         this.router.get("/list", YogaController.instance.getYogas.bind(YogaController.instance));
         this.router.get("/:id", YogaController.instance.getYogaById.bind(YogaController.instance));
+        this.router.patch("/:id", YogaController.instance.updateYoga.bind(YogaController.instance));
     }
 }
