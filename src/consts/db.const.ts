@@ -8,4 +8,7 @@ export const cDbNames = {
     exercise: "exercise" as string,
     workoutPlan: "workout_plan" as string,
     yoga: "yoga" as string,
+    users: "users" as string,
+    goals: "goals" as string,
+    userWorkoutPlan: "userWorkoutPlans" as string,
 };

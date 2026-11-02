@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { eHttpStatusCode, eResponseStatus } from "../enums/server.enum";
+import { eHeadersKeys, eHttpStatusCode, eResponseStatus } from "../enums/server.enum";
 import { iResponse } from "../interfaces/response.interface";
 import EncryptionSecurity from "../security/encryption.security";
 import { toErrorResponse } from "../utils/common.util";
@@ -9,7 +9,7 @@ import { iAdminAutoLoginPayload, iAdminLoginPayload } from "../interfaces/loginP
 
 export default class AuthController {
     public static instance: AuthController = new AuthController();
-    private constructor() { }
+    private constructor() {}
 
     public async adminLogin(req: Request, res: Response): Promise<void> {
         const { error } = AuthValidator.instance.loginSchema.validate(req.body || {});
@@ -34,6 +34,28 @@ export default class AuthController {
                 message: "Admin logged in successfully",
                 httpCode: eHttpStatusCode.OK,
                 data: loginResult.admin,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+        } catch (err: unknown) {
+            const errorRes = toErrorResponse(err);
+            const responseData: iResponse = {
+                status: eResponseStatus.FAIL,
+                message: errorRes.message ?? "Internal server error",
+                httpCode: errorRes.statusCode || eHttpStatusCode.INTERNAL_SERVER_ERROR,
+            };
+            EncryptionSecurity.instance.onResponse(req, res, responseData);
+        }
+    }
+
+    public async adminLogout(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.headers[eHeadersKeys.xUserId] as string;
+            await AuthService.instance.adminLogout(userId);
+
+            const responseData: iResponse = {
+                status: eResponseStatus.SUCCESS,
+                message: "Admin logged out successfully",
+                httpCode: eHttpStatusCode.OK,
             };
             EncryptionSecurity.instance.onResponse(req, res, responseData);
         } catch (err: unknown) {

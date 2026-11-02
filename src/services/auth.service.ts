@@ -78,6 +78,10 @@ export default class AuthService {
         };
     }
 
+    public async adminLogout(userId: string): Promise<void> {
+        await RedisClient.instance.deleteData(cRedisKeys.session(userId));
+    }
+
     public async adminAutoLogin(payload: iAdminAutoLoginPayload): Promise<iAdminLoginResult> {
         const admin = await AdminDb.findOne({
             _id: payload.userId.trim(),

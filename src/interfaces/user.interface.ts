@@ -1,0 +1,45 @@
+import { Types } from "mongoose";
+
+export interface iUsers {
+    _id?: Types.ObjectId | string;
+    fullName?: string;
+    mobile?: string;
+    email?: string;
+    age?: number;
+    gender?: string;
+    height?: number;
+    heightUnit?: string;
+    weight?: number;
+    weightUnit?: string;
+    bmi?: number;
+    isPremium?: boolean;
+    isActive?: boolean;
+    isDeleted?: boolean;
+    isRegistrationCompleted?: boolean;
+    goal?: Types.ObjectId;
+    profession?: Types.ObjectId;
+    physicalIssues?: Types.ObjectId[];
+    fcmToken?: string;
+    profilePic?: string;
+    targetWeight?: number;
+    targetTimeframe?: number;
+    stepsGoal?: number;
+    goalWaterIntake?: number;
+    doesMenstrualProfileExist?: boolean;
+    exerciseDaysPerWeek?: number;
+    exerciseTimePerDay?: number;
+    regularPhysicalActivity?: string;
+    preferredTimeForExercise?: string;
+    exerciseDays?: string[];
+    startWorkoutPlanDate?: Date;
+    endWorkoutPlanDate?: Date;
+    hasCustomizedWorkoutPlan?: boolean;
+    foodPreferenceId?: Types.ObjectId;
+    foodAllergyIds?: Types.ObjectId[];
+    foodIntoleranceIds?: Types.ObjectId[];
+    dietaryRestrictionIds?: Types.ObjectId[];
+    platform?: string;
+    appVersion?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}

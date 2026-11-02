@@ -16,6 +16,9 @@ import DietaryRestrictionRoute from "./routes/dietaryRestriction.route";
 import ExerciseRoute from "./routes/exercise.route";
 import WorkoutPlanRoute from "./routes/workoutPlan.route";
 import YogaRoute from "./routes/yoga.route";
+import AdminRoute from "./routes/admin.route";
+import DashboardRoute from "./routes/dashboard.route";
+import UserRoute from "./routes/user.route";
 import EncryptionSecurity from "./security/encryption.security";
 import AuthSecurity from "./security/auth.security";
 
@@ -30,31 +33,15 @@ CronJobsService.instance.initializeCronJobs();
 
 const app = express();
 
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-        "Origin",
-        "X-Requested-With",
-        "Content-Type",
-        "Accept",
-        "Authorization",
-        "app-id",
-        "x-app-id",
-        "app-version",
-        "x-app-version",
-        "platform",
-        "x-app-platform",
-        "hash",
-        "x-access-token",
-        "app-type",
-        "x-user-id",
-        "x-session-id",
-        "x-server-key",
-    ],
-    exposedHeaders: ["x-access-token", "Authorization"],
-    optionsSuccessStatus: 200,
-}));
+app.use(
+    cors({
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "app-id", "x-app-id", "app-version", "x-app-version", "platform", "x-app-platform", "hash", "x-access-token", "app-type", "x-user-id", "x-session-id", "x-server-key"],
+        exposedHeaders: ["x-access-token", "Authorization"],
+        optionsSuccessStatus: 200,
+    })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -77,16 +64,17 @@ app.use((req, res, next) => EncryptionSecurity.instance.onRequest(req, res, next
 
 // Routes
 app.use("/api/v1/auth", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), AuthRoute.instance.router);
-app.use("/api/v1/data", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), DataRoute.instance.router);
-app.use("/api/v1/food-preference", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), FoodPreferenceRoute.instance.router);
-app.use("/api/v1/food-allergy", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), FoodAllergyRoute.instance.router);
-app.use("/api/v1/food-intolerance", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), FoodIntoleranceRoute.instance.router);
-app.use("/api/v1/dietary-restriction", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), DietaryRestrictionRoute.instance.router);
-app.use("/api/v1/exercise", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), ExerciseRoute.instance.router);
-app.use("/api/v1/workout-plan", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), WorkoutPlanRoute.instance.router);
-app.use("/api/v1/yoga", AuthSecurity.instance.validateAppId.bind(AuthSecurity.instance), YogaRoute.instance.router);
-
-
+app.use("/api/v1/data", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), DataRoute.instance.router);
+app.use("/api/v1/food-preference", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), FoodPreferenceRoute.instance.router);
+app.use("/api/v1/food-allergy", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), FoodAllergyRoute.instance.router);
+app.use("/api/v1/food-intolerance", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), FoodIntoleranceRoute.instance.router);
+app.use("/api/v1/dietary-restriction", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), DietaryRestrictionRoute.instance.router);
+app.use("/api/v1/exercise", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), ExerciseRoute.instance.router);
+app.use("/api/v1/workout-plan", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), WorkoutPlanRoute.instance.router);
+app.use("/api/v1/yoga", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), YogaRoute.instance.router);
+app.use("/api/v1/admin", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), AdminRoute.instance.router);
+app.use("/api/v1/dashboard", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), DashboardRoute.instance.router);
+app.use("/api/v1/users", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), UserRoute.instance.router);
 
 app.use(async (req: Request, res: Response) => {
     console.log(`Received request: ${req.method} ${req.originalUrl}`);
@@ -102,3 +90,4 @@ app.use(async (req: Request, res: Response) => {
 app.listen(cEnv.PORT, () => {
     console.log(`Proxy server is running on ${cEnv.PORT}`);
 });
+
