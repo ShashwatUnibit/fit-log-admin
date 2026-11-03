@@ -102,7 +102,7 @@ export default class BannerController {
             const deletedBanner = await BannerDb.findOneAndUpdate(
                 { _id: validation.value.id, isDeleted: false },
                 { $set: { isDeleted: true } },
-                { new: true }
+                { returnDocument: "after" }
             ).lean();
 
             if (!deletedBanner) {
@@ -135,7 +135,7 @@ export default class BannerController {
             const banner = await BannerDb.findOneAndUpdate(
                 { _id: bannerId, isDeleted: false },
                 { $set: { isActive } },
-                { new: true }
+                { returnDocument: "after" }
             ).lean();
 
             if (!banner) {

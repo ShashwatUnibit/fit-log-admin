@@ -13,6 +13,10 @@ export default class GoalRoute {
         this.router.post("/create/goals", GoalController.instance.createGoal.bind(GoalController.instance));
         this.router.put("/update/goals/:goalId", GoalController.instance.updateGoalStatus.bind(GoalController.instance));
 
+        this.router.get("/faqs", GoalController.instance.getFaqs.bind(GoalController.instance));
+        this.router.post("/create/faq", GoalController.instance.createFaq.bind(GoalController.instance));
+        this.router.put("/update/faq/:faqId", GoalController.instance.updateFaqStatus.bind(GoalController.instance));
+
         this.router.get("/professions", GoalController.instance.getProfessions.bind(GoalController.instance));
         this.router.post("/create/professions", GoalController.instance.createProfession.bind(GoalController.instance));
         this.router.put("/update/professions/:professionId", GoalController.instance.updateProfessionStatus.bind(GoalController.instance));

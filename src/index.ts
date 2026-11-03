@@ -23,6 +23,7 @@ import GoalRoute from "./routes/goal.route";
 import MediaRoute from "./routes/media.route";
 import BannerRoute from "./routes/banner.route";
 import NotificationRoute from "./routes/notification.route";
+import AppConfigRoute from "./routes/appConfig.route";
 import EncryptionSecurity from "./security/encryption.security";
 import AuthSecurity from "./security/auth.security";
 
@@ -83,6 +84,7 @@ app.use("/api/v1/users", AuthSecurity.instance.validateToken.bind(AuthSecurity.i
 app.use("/api/v1/upload", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), MediaRoute.instance.router);
 app.use("/api/v1/banner", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), BannerRoute.instance.router);
 app.use("/api/v1/notification", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), NotificationRoute.instance.router);
+app.use("/api/v1/app-config", AuthSecurity.instance.validateToken.bind(AuthSecurity.instance), AppConfigRoute.instance.router);
 
 app.use(async (req: Request, res: Response) => {
     console.log(`Received request: ${req.method} ${req.originalUrl}`);

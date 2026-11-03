@@ -49,6 +49,27 @@ export default class GoalValidator {
         goalId: idSchema("goalId"),
     }).options({ convert: true, abortEarly: true, allowUnknown: false });
 
+    public createFaqSchema = Joi.object({
+        question: Joi.string().trim().min(3).max(300).required().messages({
+            "string.base": `"question" should be a type of 'text'`,
+            "string.empty": `"question" cannot be empty`,
+            "string.min": `"question" should have a minimum length of {#limit}`,
+            "string.max": `"question" should have a maximum length of {#limit}`,
+            "any.required": `"question" is a required field`,
+        }),
+        answer: Joi.string().trim().min(3).max(2000).required().messages({
+            "string.base": `"answer" should be a type of 'text'`,
+            "string.empty": `"answer" cannot be empty`,
+            "string.min": `"answer" should have a minimum length of {#limit}`,
+            "string.max": `"answer" should have a maximum length of {#limit}`,
+            "any.required": `"answer" is a required field`,
+        }),
+    }).options({ convert: true, abortEarly: true, allowUnknown: false });
+
+    public updateFaqSchema = Joi.object({
+        faqId: idSchema("faqId"),
+    }).options({ convert: true, abortEarly: true, allowUnknown: false });
+
     public createPhysicalIssueSchema = Joi.object({
         physicalIssueName: Joi.string().trim().min(2).max(100).required().messages({
             "string.base": `"physicalIssueName" should be a type of 'text'`,

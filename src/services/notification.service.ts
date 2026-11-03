@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import type { QueryFilter, UpdateQuery } from "mongoose";
 import type { Message } from "firebase-admin/messaging";
 import FirebaseService from "./firebase.service";
@@ -160,7 +160,8 @@ export default class NotificationService {
 
     /** Called every minute by the cron: starts due scheduled campaigns and fails the ones that stalled. */
     public async processScheduledCampaigns(): Promise<void> {
-        if (this.isProcessingScheduled) {
+        // The cron can fire before the database is connected; skip the tick instead of queueing queries that time out
+        if (this.isProcessingScheduled || mongoose.connection.readyState !== mongoose.ConnectionStates.connected) {
             return;
         }
         this.isProcessingScheduled = true;
@@ -188,7 +189,7 @@ export default class NotificationService {
         const claimed = await NotificationCampaignDb.findOneAndUpdate(
             { status: eNotificationCampaignStatus.SCHEDULED, scheduledAt: { $lte: now } },
             { $set: { status: eNotificationCampaignStatus.SENDING, startedAt: now } },
-            { sort: { scheduledAt: 1 }, new: true }
+            { sort: { scheduledAt: 1 }, returnDocument: "after" }
         ).select("_id").lean();
         return claimed?._id ?? null;
     }

@@ -290,7 +290,7 @@ export default class WorkoutPlanController {
             const workoutPlan = await WorkoutPlanDb.findOneAndUpdate(
                 { _id: id, isDeleted: false },
                 { $set: { isDeleted: true } },
-                { new: true }
+                { returnDocument: "after" }
             );
 
             if (!workoutPlan) {

@@ -219,7 +219,7 @@ export default class NotificationController {
             const cancelled = await NotificationCampaignDb.findOneAndUpdate(
                 { _id: id, status: eNotificationCampaignStatus.SCHEDULED },
                 { $set: { status: eNotificationCampaignStatus.CANCELLED, completedAt: new Date() } },
-                { new: true }
+                { returnDocument: "after" }
             ).select("-failedUserIds").lean();
 
             if (!cancelled) {
@@ -254,7 +254,7 @@ export default class NotificationController {
                 return;
             }
 
-            // new: false returns the document as it was, so the recipients that failed are still available
+            // returnDocument: "before" returns the document as it was, so the recipients that failed are still available
             const original = await NotificationCampaignDb.findOneAndUpdate(
                 {
                     _id: id,
@@ -274,7 +274,7 @@ export default class NotificationController {
                         failureReasons: {},
                     },
                 },
-                { new: false }
+                { returnDocument: "before" }
             ).select("failedUserIds").lean();
 
             if (!original) {

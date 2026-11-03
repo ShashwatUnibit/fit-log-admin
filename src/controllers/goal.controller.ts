@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import type { QueryFilter } from "mongoose";
+import FaqDb from "../db/mongo/faqs.mongo";
 import GoalDb from "../db/mongo/goals.mongo";
 import PhysicalIssueDb from "../db/mongo/physicalIssue.mongo";
 import ProfessionDb from "../db/mongo/profession.mongo";
 import { eHttpStatusCode, eResponseStatus } from "../enums/server.enum";
+import { iFaq } from "../interfaces/faq.interface";
 import { iGoal } from "../interfaces/goal.interface";
 import { iPhysicalIssue } from "../interfaces/physicalIssue.interface";
 import { iProfession } from "../interfaces/profession.interface";
@@ -95,6 +97,89 @@ export default class GoalController {
                     message: `Goal status updated successfully. Goal is now ${goal.isActive ? "active" : "inactive"}.`,
                     httpCode: eHttpStatusCode.OK,
                     data: goal,
+                },
+            });
+        } catch (err: unknown) {
+            this.sendFailure({ req, res, err });
+        }
+    }
+
+    // ---------- FAQs ----------
+
+    public async createFaq(req: Request, res: Response): Promise<void> {
+        const { error } = GoalValidator.instance.createFaqSchema.validate(req.body ?? {});
+        if (error) {
+            this.send({ req, res, data: { status: eResponseStatus.ERROR, message: error.message, httpCode: eHttpStatusCode.BAD_REQUEST } });
+            return;
+        }
+
+        try {
+            const { question, answer } = req.body as { question: string; answer: string };
+
+            const existingFaq = await FaqDb.findOne({ question: this.exactName(question) }).lean();
+            if (existingFaq) {
+                this.send({ req, res, data: { status: eResponseStatus.ERROR, message: `FAQ with question '${question}' already exists.`, httpCode: eHttpStatusCode.CONFLICT } });
+                return;
+            }
+
+            const faqData: Omit<iFaq, "_id"> = {
+                question: question.trim(),
+                answer: answer.trim(),
+                isActive: true,
+            };
+            const createdFaq = await FaqDb.create(faqData);
+
+            this.send({ req, res, data: { status: eResponseStatus.SUCCESS, message: "FAQ created successfully.", httpCode: eHttpStatusCode.OK, data: createdFaq } });
+        } catch (err: unknown) {
+            this.sendFailure({ req, res, err });
+        }
+    }
+
+    public async getFaqs(req: Request, res: Response): Promise<void> {
+        const filter = this.parseListFilter(req);
+        if (!filter) {
+            this.send({ req, res, data: { status: eResponseStatus.ERROR, message: this.listError(req), httpCode: eHttpStatusCode.BAD_REQUEST } });
+            return;
+        }
+
+        try {
+            const faqs = await FaqDb.find(filter).lean();
+            if (faqs.length === 0) {
+                this.send({ req, res, data: { status: eResponseStatus.ERROR, message: "No FAQ are present at the moment, Please try again.", httpCode: eHttpStatusCode.NOT_FOUND } });
+                return;
+            }
+            this.send({ req, res, data: { status: eResponseStatus.SUCCESS, message: "Faqs fetched successfully.", httpCode: eHttpStatusCode.OK, data: faqs } });
+        } catch (err: unknown) {
+            this.sendFailure({ req, res, err });
+        }
+    }
+
+    public async updateFaqStatus(req: Request, res: Response): Promise<void> {
+        const { error } = GoalValidator.instance.updateFaqSchema.validate(req.params);
+        if (error) {
+            this.send({ req, res, data: { status: eResponseStatus.ERROR, message: error.message, httpCode: eHttpStatusCode.BAD_REQUEST } });
+            return;
+        }
+
+        try {
+            const { faqId } = req.params as { faqId: string };
+            const faq = await FaqDb.findById(faqId);
+            if (!faq) {
+                this.send({ req, res, data: { status: eResponseStatus.ERROR, message: "FAQ not found.", httpCode: eHttpStatusCode.NOT_FOUND } });
+                return;
+            }
+
+            faq.isActive = !faq.isActive;
+            await faq.save();
+
+            this.send({
+                req,
+                res,
+                data: {
+                    status: eResponseStatus.SUCCESS,
+                    message: `FAQ status updated successfully. FAQ is now ${faq.isActive ? "active" : "inactive"}.`,
+                    httpCode: eHttpStatusCode.OK,
+                    data: faq,
                 },
             });
         } catch (err: unknown) {

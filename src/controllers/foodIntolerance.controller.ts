@@ -184,7 +184,7 @@ export default class FoodIntoleranceController {
             const deleted = await FoodIntoleranceDb.findOneAndUpdate(
                 { _id: id, isDeleted: false },
                 { $set: { isDeleted: true } },
-                { new: true },
+                { returnDocument: "after" },
             ).lean();
             if (!deleted) {
                 const responseData: iResponse = {

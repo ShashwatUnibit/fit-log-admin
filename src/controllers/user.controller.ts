@@ -85,7 +85,7 @@ export default class UserController {
             const user = await UserDb.findOneAndUpdate(
                 { _id: id, isDeleted: { $ne: true } },
                 { $set: { isActive } },
-                { new: true }
+                { returnDocument: "after" }
             ).lean();
 
             if (!user) {
@@ -285,7 +285,7 @@ export default class UserController {
             const user = await UserDb.findOneAndUpdate(
                 { _id: userId, isDeleted: { $ne: true } },
                 { $set: action.update },
-                { new: true }
+                { returnDocument: "after" }
             ).lean();
 
             if (!user) {

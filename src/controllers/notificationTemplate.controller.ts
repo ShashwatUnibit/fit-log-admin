@@ -89,7 +89,7 @@ export default class NotificationTemplateController {
             const template = await NotificationTemplateDb.findOneAndUpdate(
                 { _id: id, isDeleted: false },
                 { $set: changes },
-                { new: true }
+                { returnDocument: "after" }
             ).lean();
 
             if (!template) {
@@ -118,7 +118,7 @@ export default class NotificationTemplateController {
             const template = await NotificationTemplateDb.findOneAndUpdate(
                 { _id: validation.value.id, isDeleted: false },
                 { $set: { isDeleted: true } },
-                { new: true }
+                { returnDocument: "after" }
             ).lean();
 
             if (!template) {
