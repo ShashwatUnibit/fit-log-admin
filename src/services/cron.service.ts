@@ -1,5 +1,6 @@
 import { CronJob } from "cron";
 import { cEnv } from "../consts/env.const";
+import NotificationService from "./notification.service";
 
 export default class CronJobsService {
     public static instance: CronJobsService = new CronJobsService();
@@ -17,7 +18,9 @@ export default class CronJobsService {
         }
 
         this.jobs = [
-            new CronJob(this.everyMinuteCron, () => { /* empty */ }, null, false, "Asia/Kolkata"),
+            new CronJob(this.everyMinuteCron, () => {
+                void NotificationService.instance.processScheduledCampaigns();
+            }, null, false, "Asia/Kolkata"),
             new CronJob(this.everyDayCron, () => { /* empty */ }, null, false, "Asia/Kolkata"),
             new CronJob(this.every20SecondCron, () => { /* empty */ }, null, false, "Asia/Kolkata"),
         ];

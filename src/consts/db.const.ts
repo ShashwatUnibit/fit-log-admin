@@ -14,4 +14,8 @@ export const cDbNames = {
     // Mongoose lower-cases the user app's "physicalIssues" model name; the collection is "physicalissues".
     physicalIssues: "physicalissues" as string,
     userWorkoutPlan: "userWorkoutPlans" as string,
+    // Shared with the user app, whose "banner" model resolves to the pluralised "banners" collection.
+    banner: "banners" as string,
+    notificationCampaign: "notification_campaigns" as string,
+    notificationTemplate: "notification_templates" as string,
 };

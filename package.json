@@ -26,6 +26,7 @@
         "build": "tsc --noEmit && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=build/index.js --external:fsevents"
     },
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.1161.0",
         "@joi/date": "^2.1.1",
         "@langchain/core": "^1.1.31",
         "@langchain/google-genai": "^2.1.24",
@@ -38,11 +39,13 @@
         "dateformat": "^5.0.3",
         "dotenv": "^17.3.1",
         "express": "^5.2.1",
+        "firebase-admin": "^13.10.0",
         "joi": "^18.0.2",
         "jsonwebtoken": "^9.0.3",
         "langchain": "^1.2.30",
         "mongo-sanitize": "^1.1.0",
         "mongoose": "^9.2.4",
+        "multer": "^2.5.0",
         "nodemon": "^3.1.14",
         "redis": "^6.0.0",
         "uuid": "^14.0.0"

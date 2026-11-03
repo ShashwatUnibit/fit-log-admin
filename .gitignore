@@ -9,3 +9,7 @@ public
 ss/
 parkway-p2.services.json
 test_output.json
+
+# Firebase service account (secret)
+firebase-service-account.json
+*-firebase-adminsdk-*.json
