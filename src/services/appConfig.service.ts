@@ -253,6 +253,39 @@ export default class AppConfigService {
         return changed;
     }
 
+    /**
+     * Turns OTP login on or off for the whole platform. The base always gets the value; a version document
+     * that overrides it is changed too, otherwise it would silently ignore the switch. Returns how many
+     * documents changed.
+     */
+    public async applyOtp(args: { platform: eAppPlatform; enabled: boolean; actor: iRecordHistoryArgs["actor"] }): Promise<number> {
+        const { platform, enabled, actor } = args;
+        const docs = await AppConfigDb.find({ platform }).lean();
+        let changed = 0;
+
+        for (const doc of docs) {
+            const isBase = doc.appVersion === cBaseAppVersion;
+            const applies = isBase || doc.isOtpEnabled !== undefined;
+            if (!applies || doc.isOtpEnabled === enabled) {
+                continue;
+            }
+
+            const before = this.pickFields(doc);
+            const updated = await AppConfigDb.findOneAndUpdate({ _id: doc._id }, { $set: { isOtpEnabled: enabled } }, { returnDocument: "after" }).lean();
+            if (updated) {
+                await this.recordHistory({
+                    config: { _id: doc._id, platform: doc.platform, appVersion: doc.appVersion },
+                    action: eAppConfigAction.OTP,
+                    before,
+                    after: this.pickFields(updated),
+                    actor,
+                });
+                changed += 1;
+            }
+        }
+        return changed;
+    }
+
     private flatten({ value, prefix, out }: { value: unknown; prefix: string; out: Record<string, unknown> }): void {
         if (value !== null && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date)) {
             for (const [key, child] of Object.entries(value)) {

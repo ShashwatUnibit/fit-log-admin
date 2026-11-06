@@ -5,18 +5,21 @@ import FoodAllergyDb from "../db/mongo/foodAllergy.mongo";
 import FoodIntoleranceDb from "../db/mongo/foodIntolerance.mongo";
 import FoodPreferenceDb from "../db/mongo/foodPreference.mongo";
 import GoalDb from "../db/mongo/goals.mongo";
+import { BloodPressureLogDb, BloodSugarLogDb, HeartRateLogDb, MoodLogDb, StepsLogDb, WaterLogDb } from "../db/mongo/healthLog.mongo";
 import PhysicalIssueDb from "../db/mongo/physicalIssue.mongo";
 import ProfessionDb from "../db/mongo/profession.mongo";
 import UserWorkoutPlanDb from "../db/mongo/userWorkoutPlan.mongo";
 import UserDb from "../db/mongo/users.mongo";
+import { DEFAULT_STEPS_GOAL, DEFAULT_WATER_GOAL_GLASSES } from "../consts/alertThreshold.const";
 import { eHttpStatusCode, eResponseStatus } from "../enums/server.enum";
 import { eUserActionPurpose } from "../enums/userAction.enum";
 import { iResponse } from "../interfaces/response.interface";
 import { iUsers } from "../interfaces/user.interface";
-import { iNamedRef, iUserOverview } from "../interfaces/userOverview.interface";
+import { iDailyProgress, iNamedRef, iUserOverview, iUserVitals } from "../interfaces/userOverview.interface";
 import { iUserActionPayload, iUserList, iUserListQuery, iUserStatusPayload } from "../interfaces/userList.interface";
 import EncryptionSecurity from "../security/encryption.security";
 import { toErrorResponse } from "../utils/common.util";
+import { bloodPressureStatus, bloodSugarStatus, heartRateStatus, humanize, moodSentiment } from "../utils/healthStatus.util";
 import UserValidator from "../validators/user.validator";
 
 const PAGE_LIMIT = 15;
@@ -165,6 +168,7 @@ export default class UserController {
             return null;
         }
 
+        const vitalsPromise = this.buildVitals({ userId: user._id, stepsGoal: user.stepsGoal, waterGoal: user.goalWaterIntake });
         const issueIds = user.physicalIssues ?? [];
         const allergyIds = user.foodAllergyIds ?? [];
         const intoleranceIds = user.foodIntoleranceIds ?? [];
@@ -180,6 +184,7 @@ export default class UserController {
             UserWorkoutPlanDb.countDocuments({ userId: user._id, isActive: true, isDeleted: { $ne: true } }),
         ]);
 
+        const vitals = await vitalsPromise;
         const isActive = user.isActive !== false;
         const isPremium = user.isPremium === true;
         const isRegistrationCompleted = user.isRegistrationCompleted === true;
@@ -244,6 +249,62 @@ export default class UserController {
                 foodIntolerances: this.namedRefs(intoleranceIds, intolerances.map((i) => ({ id: String(i._id), name: i.title }))),
                 dietaryRestrictions: this.namedRefs(restrictionIds, restrictions.map((r) => ({ id: String(r._id), name: r.title }))),
             },
+            vitals,
+        };
+    }
+
+    /** Latest readings for the vitals cards. Steps and water cover the server's current day, matching the user app. */
+    private async buildVitals(params: { userId: Types.ObjectId | string; stepsGoal?: number; waterGoal?: number }): Promise<iUserVitals> {
+        const { userId } = params;
+        const asOf = new Date();
+        const dayStart = new Date(asOf);
+        dayStart.setHours(0, 0, 0, 0);
+        const today = { $gte: dayStart, $lte: asOf };
+        const [bp, sugar, heart, steps, water, mood] = await Promise.all([
+            BloodPressureLogDb.findOne({ userId }).sort({ date: -1, createdAt: -1 }).lean(),
+            BloodSugarLogDb.findOne({ userId }).sort({ date: -1, createdAt: -1 }).lean(),
+            HeartRateLogDb.findOne({ userId }).sort({ createdAt: -1 }).lean(),
+            StepsLogDb.findOne({ userId, createdAt: today }).sort({ createdAt: -1 }).lean(),
+            WaterLogDb.find({ userId, date: today }).select("consumedWaterIntake").lean(),
+            MoodLogDb.findOne({ userId }).sort({ date: -1, createdAt: -1 }).lean(),
+        ]);
+
+        const stepsGoal = params.stepsGoal && params.stepsGoal > 0 ? params.stepsGoal : DEFAULT_STEPS_GOAL;
+        const waterGoal = params.waterGoal && params.waterGoal > 0 ? params.waterGoal : DEFAULT_WATER_GOAL_GLASSES;
+        const glasses = water.reduce((sum, w) => sum + (w.consumedWaterIntake ?? 0), 0);
+        const progress = (value: number, goal: number): iDailyProgress => ({ value, goal, percentOfGoal: Math.round((value / goal) * 100), asOf });
+        const moodKey = mood?.mood ?? "";
+
+        return {
+            bloodPressure: bp ? {
+                systolic: bp.systolic ?? 0,
+                diastolic: bp.diastolic ?? 0,
+                unit: "mmHg",
+                status: bloodPressureStatus({ systolic: bp.systolic ?? 0, diastolic: bp.diastolic ?? 0 }),
+                loggedAt: bp.date ?? bp.createdAt ?? asOf,
+            } : null,
+            bloodSugar: sugar ? {
+                value: sugar.bloodSugar ?? 0,
+                unit: "mg/dL",
+                mealContext: sugar.mealContext ?? null,
+                mealContextLabel: sugar.mealContext ? humanize(sugar.mealContext) : null,
+                status: bloodSugarStatus({ value: sugar.bloodSugar ?? 0, mealContext: sugar.mealContext }),
+                loggedAt: sugar.date ?? sugar.createdAt ?? asOf,
+            } : null,
+            heartRate: heart ? {
+                value: heart.beatsPerMinute ?? 0,
+                unit: "bpm",
+                status: heartRateStatus(heart.beatsPerMinute ?? 0),
+                loggedAt: heart.createdAt ?? asOf,
+            } : null,
+            stepsToday: { ...progress(steps?.coveredSteps ?? 0, stepsGoal), unit: "steps" },
+            waterToday: { ...progress(glasses, waterGoal), unit: "glasses" },
+            latestMood: mood ? {
+                mood: moodKey,
+                label: humanize(moodKey),
+                sentiment: moodSentiment(moodKey),
+                loggedAt: mood.date ?? mood.createdAt ?? asOf,
+            } : null,
         };
     }
 

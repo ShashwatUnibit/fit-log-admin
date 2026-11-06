@@ -16,6 +16,7 @@ export default class AppConfigRoute {
         this.router.get("/history", controller.getHistory.bind(controller));
         this.router.post("/create", controller.createConfig.bind(controller));
         this.router.patch("/maintenance", controller.setMaintenance.bind(controller));
+        this.router.patch("/otp", controller.setOtp.bind(controller));
         this.router.post("/force-update/bulk", controller.bulkForceUpdate.bind(controller));
         this.router.post("/history/:id/restore", controller.restoreHistory.bind(controller));
 

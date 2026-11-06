@@ -10,6 +10,7 @@ export enum eAppConfigAction {
     RESTORE = "restore",
     MAINTENANCE = "maintenance",
     FORCE_UPDATE = "force_update",
+    OTP = "otp",
 }
 
 // The appVersion value of the document every version of a platform inherits from.
@@ -21,6 +22,7 @@ export const cAppConfigFields = [
     "companyPolicies",
     "forceUpdate",
     "forceUpdateMessage",
+    "isOtpEnabled",
     "supportEmail",
     "supportPhone",
     "playStoreUrl",

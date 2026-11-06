@@ -1,0 +1,1054 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>FitLog 360° User Profile</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: FitLog Admin shell (sidebar + top bar) around a single-user 360° profile: dark header card, KPI strip, tabbed health data. */
+:root {
+  --bg-page:#f6f8f7; --bg-surface:#ffffff; --bg-subtle:#eef2f0; --bg-raised:#ffffff;
+  --border:#e3e8e6; --border-strong:#cfd6d3; --border-control:#828f8a;
+  --ink:#0f1a16; --muted:#4a5853; --subtle:#66756f; --ink-inverse:#ffffff;
+  --brand-500:#12b886; --brand-600:#08805a; --brand-700:#066b4b; --brand-text:#0a7a55; --brand-tint:#e6f6ef; --focus-ring:#0a7a55;
+  --sidebar-bg:#0d1c17; --sidebar-ink:#e3ece9; --sidebar-muted:#8ea29b; --sidebar-hover:#16302a; --sidebar-active-bg:#e6f6ef; --sidebar-active-ink:#0a7a55;
+  --success-text:var(--brand-text); --success-bg:var(--brand-tint);
+  --danger-500:#dc3b3b; --danger-text:#c0262d; --danger-bg:#fdecec;
+  --warning-text:#8f5300; --warning-bg:#fff3d6;
+  --info-text:#1f5fbf; --info-bg:#e8f0fd;
+  --chart-1:#0f9f73; --chart-2:#0891b2; --chart-3:#5b5bd6; --chart-4:#d9468f; --chart-5:#d97706; --chart-grid:var(--border);
+  --scrim:rgba(10,18,15,.48);
+  --shadow-xs:0 1px 2px rgba(15,26,22,.05);
+  --shadow-sm:0 1px 3px rgba(15,26,22,.08),0 1px 2px rgba(15,26,22,.04);
+  --shadow-md:0 8px 24px rgba(15,26,22,.10),0 2px 6px rgba(15,26,22,.06);
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px; --space-6:24px; --space-8:32px; --space-12:48px;
+  --radius-sm:6px; --radius-md:8px; --radius-lg:12px; --radius-full:9999px;
+  --sidebar-width:256px; --sidebar-width-collapsed:72px; --topbar-height:64px; --control-sm:32px; --control-md:40px;
+  --font-sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg-page:#0b1210; --bg-surface:#121b18; --bg-subtle:#1a2521; --bg-raised:#1a2521;
+  --border:#24302c; --border-strong:#33413c; --border-control:#5f706a;
+  --ink:#ecf2ef; --muted:#a9b7b2; --subtle:#8a9a94; --ink-inverse:#06231a;
+  --brand-500:#2fcf8f; --brand-600:#2fcf8f; --brand-700:#5ee3ad; --brand-text:#3ddc9b; --brand-tint:#10322a; --focus-ring:#3ddc9b;
+  --sidebar-bg:#0f2a21; --sidebar-ink:#e3ece9; --sidebar-muted:#8fb0a4; --sidebar-hover:#163a2e; --sidebar-active-bg:#1f4d3d; --sidebar-active-ink:#5ee3ad;
+  --danger-500:#f06b6b; --danger-text:#ff8a8a; --danger-bg:#3a1517;
+  --warning-text:#f6c35b; --warning-bg:#33270d; --info-text:#8db8ff; --info-bg:#14243d;
+  --chart-1:#34d399; --chart-2:#22c3e6; --chart-3:#8c8cf5; --chart-4:#f07ab4; --chart-5:#f5a524;
+  --scrim:rgba(0,0,0,.6); --shadow-xs:none; --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 8px 24px rgba(0,0,0,.5);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg-page:#0b1210; --bg-surface:#121b18; --bg-subtle:#1a2521; --bg-raised:#1a2521;
+  --border:#24302c; --border-strong:#33413c; --border-control:#5f706a;
+  --ink:#ecf2ef; --muted:#a9b7b2; --subtle:#8a9a94; --ink-inverse:#06231a;
+  --brand-500:#2fcf8f; --brand-600:#2fcf8f; --brand-700:#5ee3ad; --brand-text:#3ddc9b; --brand-tint:#10322a; --focus-ring:#3ddc9b;
+  --sidebar-bg:#0f2a21; --sidebar-ink:#e3ece9; --sidebar-muted:#8fb0a4; --sidebar-hover:#163a2e; --sidebar-active-bg:#1f4d3d; --sidebar-active-ink:#5ee3ad;
+  --danger-500:#f06b6b; --danger-text:#ff8a8a; --danger-bg:#3a1517;
+  --warning-text:#f6c35b; --warning-bg:#33270d; --info-text:#8db8ff; --info-bg:#14243d;
+  --chart-1:#34d399; --chart-2:#22c3e6; --chart-3:#8c8cf5; --chart-4:#f07ab4; --chart-5:#f5a524;
+  --scrim:rgba(0,0,0,.6); --shadow-xs:none; --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 8px 24px rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg-page); color: var(--ink); font-family: var(--font-sans); font-size: 14px; line-height: 20px; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+h1,h2,h3,p { margin: 0; text-wrap: balance; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* Type scale (design system) */
+.t-h1 { font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.015em; }
+.t-h2 { font-size: 18px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.t-h3 { font-size: 16px; line-height: 24px; font-weight: 600; letter-spacing: -0.005em; }
+.t-body-lg { font-size: 15px; line-height: 24px; }
+.t-body { font-size: 14px; line-height: 20px; }
+.t-strong { font-size: 14px; line-height: 20px; font-weight: 500; }
+.t-small { font-size: 13px; line-height: 18px; }
+.t-caption { font-size: 12px; line-height: 16px; }
+.t-label { font-size: 13px; line-height: 18px; font-weight: 500; }
+.t-label-sm { font-size: 12px; line-height: 16px; font-weight: 500; }
+.t-overline { font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.t-metric-lg { font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -0.02em; }
+.t-metric { font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.t-metric-sm { font-size: 14px; line-height: 20px; font-weight: 600; }
+.t-mono { font-family: var(--font-mono); font-size: 12px; line-height: 16px; }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); } .subtle { color: var(--subtle); }
+
+/* Shell */
+.shell { display: flex; min-height: 100vh; }
+.side { flex: 0 0 var(--sidebar-width); width: var(--sidebar-width); background: var(--sidebar-bg); color: var(--sidebar-ink); display: flex; flex-direction: column; }
+.side__brand { display: flex; align-items: center; gap: var(--space-3); height: var(--topbar-height); padding: 0 var(--space-5); border-bottom: 1px solid var(--sidebar-hover); }
+.logo { width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--brand-500); color: #06231a; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none; }
+.side__tag { padding: 0 6px; border-radius: 4px; border: 1px solid var(--sidebar-muted); color: var(--sidebar-muted); font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: .06em; }
+.side nav { flex: 1; padding: var(--space-3); display: flex; flex-direction: column; gap: 2px; }
+.side__label { color: var(--sidebar-muted); margin: var(--space-4) var(--space-3) var(--space-2); }
+.navi { display: flex; align-items: center; gap: var(--space-3); height: var(--control-md); padding: 0 var(--space-3); border-radius: var(--radius-md); border: 0; background: transparent; color: var(--sidebar-ink); text-align: left; cursor: pointer; width: 100%; }
+.navi:hover { background: var(--sidebar-hover); }
+.navi[aria-current="page"] { background: var(--sidebar-active-bg); color: var(--sidebar-active-ink); font-weight: 600; }
+.navi__count { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-full); background: var(--danger-500); color: #fff; font-size: 12px; line-height: 20px; text-align: center; }
+.side__user { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-5); border-top: 1px solid var(--sidebar-hover); }
+.who, .whoami { display: flex; flex-direction: column; }
+.col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.top { display: flex; align-items: center; gap: var(--space-4); height: var(--topbar-height); background: var(--bg-surface); border-bottom: 1px solid var(--border);
+  padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.search { display: flex; align-items: center; gap: var(--space-2); width: min(420px, 100%); height: var(--control-md); padding: 0 var(--space-2) 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg-page); color: var(--subtle); cursor: pointer; }
+.kbd { display: inline-flex; align-items: center; height: 22px; padding: 0 6px; border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--bg-surface); color: var(--muted); font-family: var(--font-mono); font-size: 12px; margin-left: auto; }
+.envpill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--space-3); border-radius: var(--radius-full); border: 1px solid currentColor; color: var(--success-text); background: var(--success-bg); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.dot { width: 6px; height: 6px; border-radius: var(--radius-full); background: currentColor; flex: none; }
+.iconbtn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: var(--control-md); height: var(--control-md); border-radius: var(--radius-md); border: 0; background: transparent; color: var(--muted); cursor: pointer; flex: none; }
+.iconbtn:hover { background: var(--bg-subtle); color: var(--ink); }
+.iconbtn__count { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full); background: var(--danger-500); color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; box-shadow: 0 0 0 2px var(--bg-surface); }
+.avatar { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--brand-tint); color: var(--brand-text); font-size: 13px; font-weight: 500; flex: none; }
+.content { width: 100%; max-width: 1280px; display: flex; flex-direction: column; gap: var(--space-5);
+  padding-block: var(--space-6) var(--space-12); padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.ic { width: 16px; height: 16px; flex: none; }
+.ic-md { width: 20px; height: 20px; flex: none; }
+
+/* Prototype bar */
+.proto { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-5); padding: var(--space-3) var(--space-4); border: 1px dashed var(--border-control); border-radius: var(--radius-md); background: var(--bg-surface); }
+.proto__title { color: var(--subtle); }
+.proto__group { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+
+/* Breadcrumb */
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; color: var(--subtle); font-size: 13px; line-height: 18px; }
+.crumbs li[aria-current] { color: var(--ink); font-weight: 500; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-md); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 500; }
+.btn--sm { height: var(--control-sm); padding: 0 var(--space-3); font-size: 13px; }
+.btn--secondary { background: var(--bg-surface); color: var(--ink); border-color: var(--border-strong); box-shadow: var(--shadow-xs); }
+.btn--secondary:hover { background: var(--bg-subtle); }
+.btn--ghost { background: transparent; color: var(--muted); }
+.btn--ghost:hover { background: var(--bg-subtle); color: var(--ink); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Segmented + pills */
+.seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-subtle); border-radius: var(--radius-md); flex-wrap: wrap; }
+.seg button { height: 26px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 500; }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-checked="true"], .seg button[aria-selected="true"] { background: var(--bg-surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+.pills { display: inline-flex; flex-wrap: wrap; gap: var(--space-2); }
+.pills button { height: var(--control-sm); padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg-surface); color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+.pills button[aria-checked="true"], .pills button[aria-selected="true"] { background: var(--brand-tint); border-color: var(--brand-text); color: var(--brand-text); }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: var(--space-1); height: 22px; padding: 0 var(--space-2); border-radius: var(--radius-sm); font-size: 12px; line-height: 16px; font-weight: 500; white-space: nowrap; }
+.badge .ic { width: 14px; height: 14px; }
+.b-success { background: var(--success-bg); color: var(--success-text); }
+.b-danger { background: var(--danger-bg); color: var(--danger-text); }
+.b-warning { background: var(--warning-bg); color: var(--warning-text); }
+.b-info { background: var(--info-bg); color: var(--info-text); }
+.b-neutral { background: var(--bg-subtle); color: var(--muted); }
+
+/* Header card (dark) */
+.hero { background: var(--sidebar-bg); color: var(--sidebar-ink); border-radius: var(--radius-lg); padding: var(--space-6); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); }
+.hero__avatar { width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--brand-500); color: #06231a; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 600; flex: none; }
+.hero__main { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.hero__meta { color: var(--sidebar-muted); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: 4px; }
+.hchip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: var(--radius-full); border: 1px solid var(--sidebar-muted); color: var(--sidebar-ink); font-size: 12px; font-weight: 500; }
+.hchip--ok { border-color: #5ee3ad; color: #5ee3ad; }
+.hbtn { display: inline-flex; align-items: center; gap: var(--space-2); height: var(--control-md); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--sidebar-muted); background: transparent; color: var(--sidebar-ink); cursor: pointer; font-weight: 500; }
+.hbtn:hover { background: var(--sidebar-hover); }
+.menuwrap { position: relative; }
+.menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; width: 240px; padding: 6px; background: var(--bg-raised); color: var(--ink); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); display: flex; flex-direction: column; }
+.menu button { display: flex; align-items: center; gap: var(--space-2); height: 36px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-sm); background: transparent; text-align: left; cursor: pointer; font-size: 14px; }
+.menu button:hover, .menu button:focus-visible { background: var(--bg-subtle); outline-offset: -2px; }
+.menu .danger { color: var(--danger-text); }
+.menu hr { border: 0; border-top: 1px solid var(--border); margin: 4px 0; }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(176px, 1fr)); gap: var(--space-4); }
+.kpi { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); padding: var(--space-4) var(--space-5); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kpi__row { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+
+/* Tabs */
+.tabs { display: flex; gap: var(--space-6); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: thin; }
+.tab { display: inline-flex; align-items: center; gap: var(--space-2); height: 44px; padding: 0; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 500; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--brand-600); }
+
+/* Controls row */
+.controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.controls__l { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.rangeinfo { color: var(--subtle); }
+.custom { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-2); }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field input, .field select, .sel { height: var(--control-sm); padding: 0 var(--space-2); border: 1px solid var(--border-control); border-radius: var(--radius-md); background: var(--bg-surface); color: var(--ink); font-size: 13px; }
+.field__err { color: var(--danger-text); }
+.ro { display: inline-flex; align-items: center; gap: var(--space-2); padding: 6px var(--space-3); border-radius: var(--radius-md); background: var(--info-bg); color: var(--info-text); font-size: 13px; line-height: 18px; font-weight: 500; }
+
+/* Cards */
+.grid { display: grid; gap: var(--space-4); }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.card__top { display: flex; flex-direction: column; gap: var(--space-3); }
+.eyebrow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); color: var(--brand-text); }
+.divider { height: 1px; background: var(--border); border: 0; margin: 0; }
+.card__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+.dl { display: grid; grid-template-columns: minmax(120px, 40%) 1fr; gap: 10px var(--space-4); margin: 0; }
+.dl dt { color: var(--muted); font-size: 13px; line-height: 20px; }
+.dl dd { margin: 0; font-variant-numeric: tabular-nums; }
+.stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+/* Latest readings tiles */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: var(--space-3); }
+.tile { display: flex; flex-direction: column; gap: 6px; padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-surface); text-align: left; cursor: pointer; min-width: 0; box-shadow: var(--shadow-xs); }
+.tile:hover { border-color: var(--brand-text); }
+.tile__label { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+.tile__go { margin-left: auto; color: var(--subtle); }
+
+/* Chart */
+.chartbox { position: relative; height: 280px; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: 13px; }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.lg-line { width: 18px; height: 0; border-top: 2px solid; }
+.lg-dash { border-top-style: dashed; }
+.lg-dot { border-top-style: dotted; }
+.lg-band { width: 14px; height: 10px; border-radius: 2px; }
+
+/* Meter */
+.meter { display: flex; flex-direction: column; gap: var(--space-2); }
+.meter__track { height: 10px; border-radius: var(--radius-full); background: var(--bg-subtle); overflow: hidden; }
+.meter__fill { height: 100%; border-radius: var(--radius-full); background: var(--brand-600); }
+
+/* Tables */
+.tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-surface); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; min-width: 560px; }
+caption { text-align: left; padding: 0; }
+th { text-align: left; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--muted); background: var(--bg-subtle); padding: 10px var(--space-4); white-space: nowrap; border-bottom: 1px solid var(--border); }
+td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: var(--bg-page); }
+.r { text-align: right; font-variant-numeric: tabular-nums; }
+.pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+.pager__r { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+/* Mood */
+.stack { display: flex; height: 36px; border-radius: var(--radius-md); overflow: hidden; gap: 2px; background: var(--bg-surface); }
+.stack__seg { display: flex; align-items: center; justify-content: center; color: var(--ink); font-size: 12px; font-weight: 600; min-width: 0; overflow: hidden; white-space: nowrap; }
+.moodlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.moodlist li { display: grid; grid-template-columns: 24px 1fr auto auto; align-items: center; gap: var(--space-3); }
+.tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tl li { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-3); position: relative; padding-bottom: var(--space-4); }
+.tl li::before { content: ""; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: var(--border); }
+.tl li:last-child::before { display: none; }
+.tl__ic { width: 40px; height: 40px; border-radius: var(--radius-full); display: inline-flex; align-items: center; justify-content: center; }
+.moodic { width: 24px; height: 24px; flex: none; }
+
+/* Menstrual */
+.cycles { display: flex; flex-direction: column; gap: var(--space-3); }
+.cycle { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-3); align-items: center; }
+.cycle__bar { position: relative; display: flex; height: 36px; border-radius: var(--radius-md); overflow: hidden; gap: 2px; }
+.ph { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; min-width: 0; }
+.ph--period { background: color-mix(in srgb, var(--chart-4) 26%, var(--bg-surface)); }
+.ph--foll { background: color-mix(in srgb, var(--chart-2) 22%, var(--bg-surface)); }
+.ph--ovu { background: color-mix(in srgb, var(--chart-1) 28%, var(--bg-surface)); }
+.ph--lut { background: color-mix(in srgb, var(--chart-3) 22%, var(--bg-surface)); }
+.cycle--pred .ph { background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--bg-surface) 55%, transparent) 6px 9px); }
+.today { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+.today::after { content: "Today"; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; color: var(--ink); }
+.ai { border-style: dashed; border-color: var(--border-control); background: var(--bg-subtle); }
+.ai ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Empty / skeleton / toast */
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3); padding: var(--space-12) var(--space-6); color: var(--muted); }
+.empty__ic { width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--bg-subtle); color: var(--muted); display: inline-flex; align-items: center; justify-content: center; }
+.empty p { max-width: 420px; }
+.skel { background: var(--bg-subtle); border-radius: var(--radius-sm); position: relative; overflow: hidden; }
+.skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--bg-surface) 50%, transparent), transparent); transform: translateX(-100%); animation: sh 1.2s infinite; }
+@keyframes sh { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .skel::after { animation: none; } }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 40; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--ink); color: var(--bg-surface); box-shadow: var(--shadow-md); max-width: calc(100% - 32px); }
+.subtabs { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+/* Responsive */
+@media (max-width: 1180px) {
+  .side { flex-basis: var(--sidebar-width-collapsed); width: var(--sidebar-width-collapsed); }
+  .side .lbl, .side__label, .side__tag, .side__brand .brandname, .side__user .who, .navi__count { display: none; }
+  .side__brand, .side__user { justify-content: center; padding: 0; }
+  .side__user { padding-block: var(--space-4); }
+  .navi { justify-content: center; padding: 0; }
+  .whoami { display: none; }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .side__label + .navi, .side nav > .navi:first-child { margin-top: var(--space-2); }
+}
+@media (max-width: 720px) {
+  .side { display: none; }
+  .top { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .content { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .search span.ph-text, .kbd, .whoami { display: none; }
+  .search { width: auto; }
+  .g2 { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cycle { grid-template-columns: 1fr; }
+  .chartbox { height: 240px; }
+}
+</style>
+
+<div class="shell">
+  <aside class="side" aria-label="Main navigation">
+    <div class="side__brand"><span class="logo" aria-hidden="true">FL</span><span class="t-h3 brandname">FitLog</span><span class="side__tag">ADMIN</span></div>
+    <nav id="sidenav"></nav>
+    <div class="side__user"><span class="avatar" style="background:var(--sidebar-hover);color:var(--sidebar-ink)" aria-hidden="true">EM</span><span class="who"><span class="t-strong">Elena Morris</span><span class="t-caption" style="color:var(--sidebar-muted)">Super Admin</span></span></div>
+  </aside>
+
+  <div class="col">
+    <header class="top">
+      <button type="button" class="search" id="searchBtn" aria-label="Search users, content and settings"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></svg><span class="ph-text t-body">Search users, exercises, settings…</span><span class="kbd">Ctrl K</span></button>
+      <span style="flex:1"></span>
+      <span class="envpill"><span class="dot"></span>Production</span>
+      <button type="button" class="iconbtn" aria-label="Notifications, 4 unread" id="bellBtn"><svg class="ic-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2zM10 21h4"/></svg><span class="iconbtn__count num" aria-hidden="true">4</span></button>
+      <span style="display:flex;align-items:center;gap:10px"><span class="avatar" aria-hidden="true">EM</span><span class="whoami"><span class="t-strong">Elena Morris</span><span class="t-caption subtle">Super Admin</span></span></span>
+    </header>
+
+    <main class="content" id="main">
+      <section class="proto" aria-label="Prototype controls">
+        <span class="t-overline proto__title">Prototype controls</span>
+        <div class="proto__group"><span class="t-label muted" id="lbl-mode">Tab state</span><div class="seg" role="radiogroup" aria-labelledby="lbl-mode" data-radio="mode" id="modeCtl"></div></div>
+        <div class="proto__group"><span class="t-label muted" id="lbl-theme">Theme</span><div class="seg" role="radiogroup" aria-labelledby="lbl-theme" data-radio="theme" id="themeCtl"></div></div>
+        <div class="proto__group"><span class="t-label muted" id="lbl-sex">User sex</span><div class="seg" role="radiogroup" aria-labelledby="lbl-sex" data-radio="sex" id="sexCtl"></div></div>
+      </section>
+
+      <nav aria-label="Breadcrumb"><ol class="crumbs"><li>Users &amp; health profiles</li><li aria-hidden="true">/</li><li aria-current="page" id="crumbName">Priya Sharma</li></ol></nav>
+
+      <section class="hero" aria-labelledby="heroTitle">
+        <span class="hero__avatar" aria-hidden="true" id="heroInitial">P</span>
+        <div class="hero__main">
+          <h1 class="t-h1 num" id="heroTitle">+91 98•••• 3021</h1>
+          <p class="t-small hero__meta" id="heroMeta">Priya Sharma · Female · 25 · Joined Aug 14, 2026 · <span class="t-mono">usr_6712ac0e9b41</span></p>
+          <div class="chips">
+            <span class="hchip hchip--ok"><span class="dot"></span>Active</span>
+            <span class="hchip">Free plan</span>
+            <span class="hchip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Registration complete</span>
+          </div>
+        </div>
+        <div class="menuwrap">
+          <button type="button" class="hbtn" id="actBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="actMenu">Account actions <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="menu" role="menu" id="actMenu" aria-labelledby="actBtn" hidden>
+            <button type="button" role="menuitem" tabindex="-1" data-act="Send push notification">Send push notification</button>
+            <button type="button" role="menuitem" tabindex="-1" data-act="Grant premium">Grant premium</button>
+            <button type="button" role="menuitem" tabindex="-1" data-act="Force logout everywhere">Force logout everywhere</button>
+            <button type="button" role="menuitem" tabindex="-1" data-act="Export user data">Export user data (JSON)</button>
+            <hr>
+            <button type="button" role="menuitem" tabindex="-1" class="danger" data-act="Deactivate account">Deactivate account</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="kpis" aria-label="Body and plan summary" id="kpis"></section>
+
+      <div class="tabs" role="tablist" aria-label="User profile sections" id="tabs"></div>
+      <div id="panel" role="tabpanel" tabindex="0" style="display:flex;flex-direction:column;gap:var(--space-5);min-width:0"></div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function () {
+'use strict';
+/* ---------- Utilities ---------- */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var DAY = 864e5;
+var TODAY = new Date(2026, 10, 6, 12, 15);            // data as of Nov 6, 2026, 12:15 IST
+var T0 = new Date(2026, 10, 6);                        // today 00:00
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dayAt(off, h, m) { var d = new Date(T0.getTime() - off * DAY); d.setHours(h, m || 0, 0, 0); return d; }
+function fmtD(d) { return MON[d.getMonth()] + ' ' + d.getDate(); }
+function fmtDY(d) { return fmtD(d) + ', ' + d.getFullYear(); }
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function fmtT(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function fmtDT(d) { return fmtD(d) + ', ' + fmtT(d); }
+function rel(d) {
+  var mins = Math.round((TODAY - d) / 60000);
+  if (mins < 60) return mins + ' min ago';
+  if (mins < 1440) return Math.round(mins / 60) + ' hr ago';
+  if (mins < 2880) return 'Yesterday, ' + fmtT(d);
+  return fmtDT(d);
+}
+function n(x) { return x.toLocaleString('en-IN'); }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+var rnd = mulberry(20261106);
+function gauss() { var u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue('--' + name).trim(); }
+
+var ICON = {
+  dashboard: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  alert: 'M12 4l9 16H3zM12 10v4M12 17h.01',
+  report: 'M4 20V10M10 20V4M16 20v-7M21 20H3',
+  users: 'M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM21 20v-1a4 4 0 0 0-3-3.85M16 4.15a3.5 3.5 0 0 1 0 6.7',
+  exercise: 'M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12',
+  plans: 'M9 3h6v3H9zM7 4.5H5V21h14V4.5h-2M8 11h8M8 15h5',
+  yoga: 'M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM5 11l7 2 7-2M12 13v3M7 20l5-4 5 4',
+  nutrition: 'M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 2-3 5s1 4 3 4v9',
+  content: 'M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01',
+  push: 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2zM10 21h4',
+  device: 'M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2',
+  taxonomy: 'M4 4h6v6H4zM14 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0zM7 14l4 6H3zM14 14h6v6h-6z',
+  shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4',
+  history: 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 7v5l3 2',
+  server: 'M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01',
+  help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01',
+  heart: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z',
+  pulse: 'M3 12h4l2-6 4 12 2-6h6',
+  droplet: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',
+  bolt: 'M13 3L5 14h6l-1 7 8-11h-6z',
+  lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3',
+  check: 'M5 12l5 5 9-10',
+  up: 'M12 19V5M6 11l6-6 6 6',
+  down: 'M12 5v14M6 13l6 6 6-6',
+  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+  chevr: 'M9 6l6 6-6 6',
+  chevl: 'M15 6l-6 6 6 6',
+  first: 'M17 6l-6 6 6 6M7 6v12',
+  last: 'M7 6l6 6-6 6M17 6v12',
+  file: 'M6 3h8l4 4v14H6zM14 3v4h4M9 13h6M9 17h4',
+  moon: 'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',
+  sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
+  info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5h.01',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2'
+};
+function ic(name, cls) { return '<svg class="' + (cls || 'ic') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + ICON[name] + '"/></svg>'; }
+
+/* ---------- Sample data: Priya Sharma, 25 F, 160 cm, 69.8 kg, weight loss ---------- */
+var STEP_GOAL = 7000, WATER_GOAL = 14;
+var BP = [], SUGAR = [], HR = [], ACT = [], MOOD = [];
+var bpAbn = { 0: [128, 79], 3: [138, 92], 11: [126, 78], 19: [142, 94], 26: [124, 76], 47: [131, 86], 63: [121, 77] };
+var sugarAbn = { 1: ['fasting', 112], 5: ['afterMeal', 204], 9: ['beforeMeal', 64], 14: ['fasting', 131], 22: ['afterMeal', 186], 38: ['fasting', 104], 55: ['afterMeal', 211] };
+var hrAbn = { 2: 108, 8: 112, 17: 54, 30: 104, 44: 57 };
+var MOODS = [
+  { key: 'great', label: 'Great', color: 'chart-1', w: .18, notes: ['Hit 9k steps and felt strong', 'Great yoga session before work', 'Down 0.5 kg this week', 'Productive day, slept well'] },
+  { key: 'good', label: 'Good', color: 'chart-2', w: .34, notes: ['Morning walk with my sister', 'Cooked dal and sabzi, no takeout', 'Workout done before office', 'Felt light after skipping chai sugar'] },
+  { key: 'okay', label: 'Okay', color: 'subtle', w: .24, notes: ['Busy day, nothing special', 'A bit tired after work', 'Skipped workout, will do tomorrow', 'Rainy day, stayed in'] },
+  { key: 'low', label: 'Low', color: 'chart-3', w: .12, notes: ['Slept only 5 hours', 'Cramps all afternoon', 'Missed home, felt lonely', 'Headache since morning'] },
+  { key: 'stressed', label: 'Stressed', color: 'chart-5', w: .12, notes: ['Sprint deadline at work', 'Two-hour commute in traffic', 'Scale showed more than expected', 'Back-to-back meetings'] }
+];
+var MOODBY = {}; MOODS.forEach(function (m) { MOODBY[m.key] = m; });
+for (var i = 0; i < 90; i++) {
+  // Blood pressure: one morning reading most days, some evening readings
+  if (bpAbn[i] || i === 0 || rnd() > .12) {
+    var s = bpAbn[i] ? bpAbn[i][0] : clamp(Math.round(112 + gauss() * 4), 100, 119);
+    var d = bpAbn[i] ? bpAbn[i][1] : clamp(Math.round(72 + gauss() * 3), 62, 79);
+    BP.push({ t: dayAt(i, 7, 30 + Math.floor(rnd() * 70)), sys: s, dia: d });
+    if (i > 0 && rnd() < .18) BP.push({ t: dayAt(i, 20, Math.floor(rnd() * 50)), sys: clamp(Math.round(110 + gauss() * 4), 100, 119), dia: clamp(Math.round(71 + gauss() * 3), 62, 79) });
+  }
+  // Blood sugar
+  var sa = sugarAbn[i];
+  if ((sa && sa[0] === 'fasting') || (i !== 0 && rnd() < .7)) SUGAR.push({ t: dayAt(i, 7, 5 + Math.floor(rnd() * 40)), ctx: 'fasting', v: sa && sa[0] === 'fasting' ? sa[1] : clamp(Math.round(91 + gauss() * 5), 78, 99) });
+  if ((sa && sa[0] === 'beforeMeal') || (i !== 0 && rnd() < .3)) SUGAR.push({ t: dayAt(i, 12, 50 + Math.floor(rnd() * 9)), ctx: 'beforeMeal', v: sa && sa[0] === 'beforeMeal' ? sa[1] : clamp(Math.round(94 + gauss() * 6), 74, 99) });
+  if ((sa && sa[0] === 'afterMeal') || (i !== 0 && rnd() < .45)) SUGAR.push({ t: dayAt(i, 14, 30 + Math.floor(rnd() * 25)), ctx: 'afterMeal', v: sa && sa[0] === 'afterMeal' ? sa[1] : clamp(Math.round(124 + gauss() * 8), 100, 139) });
+  // Heart rate
+  if (i === 0 || rnd() < .9) HR.push({ t: dayAt(i, 7, Math.floor(rnd() * 50)), bpm: hrAbn[i] && hrAbn[i] < 60 ? hrAbn[i] : clamp(Math.round(73 + gauss() * 4), 62, 88) });
+  if (hrAbn[i] && hrAbn[i] > 100) HR.push({ t: dayAt(i, 17, 10 + Math.floor(rnd() * 40)), bpm: hrAbn[i] });
+  else if (i > 0 && rnd() < .5) HR.push({ t: dayAt(i, 16, Math.floor(rnd() * 59)), bpm: clamp(Math.round(82 + gauss() * 6), 66, 98) });
+  // Steps and water
+  var wd = new Date(T0.getTime() - i * DAY).getDay();
+  var steps = i === 0 ? 3840 : clamp(Math.round(6500 - (wd === 0 || wd === 6 ? 900 : 0) + gauss() * 1800), 1400, 13200);
+  var water = i === 0 ? 5 : clamp(Math.round(11.4 + gauss() * 2.4), 4, 17);
+  ACT.push({ t: new Date(T0.getTime() - i * DAY), steps: steps, water: water });
+  // Mood
+  if (i === 0) MOOD.push({ t: dayAt(0, 9, 40), mood: 'good', note: 'Morning walk with my sister, felt fresh' });
+  else if (rnd() < .8) {
+    var r = rnd(), acc = 0, pick = MOODS[0];
+    for (var k = 0; k < MOODS.length; k++) { acc += MOODS[k].w; if (r <= acc) { pick = MOODS[k]; break; } }
+    MOOD.push({ t: dayAt(i, 20 + Math.floor(rnd() * 3), Math.floor(rnd() * 59)), mood: pick.key, note: rnd() < .15 ? '' : pick.notes[Math.floor(rnd() * pick.notes.length)] });
+  }
+}
+[BP, SUGAR, HR, MOOD].forEach(function (a) { a.sort(function (x, y) { return y.t - x.t; }); });
+// ACT is newest first already
+
+var MENSTRUAL = { lastPeriodStartDate: new Date(2026, 9, 22), typicalCycleLength: 29, typicalPeriodLength: 5, cycleRegularity: 'Regular', updated: new Date(2026, 9, 23, 21, 10) };
+
+/* ---------- Clinical categories (display only) ---------- */
+function bpCat(r) { if (r.sys >= 130 || r.dia >= 80) return 'High'; if (r.sys >= 120) return 'Elevated'; return 'Normal'; }
+var CTX = { fasting: 'Fasting', beforeMeal: 'Before meal', afterMeal: 'After meal' };
+function sugarCat(r) {
+  if (r.v < 70) return 'Low';
+  if (r.ctx === 'afterMeal') return r.v >= 200 ? 'High' : r.v >= 140 ? 'Elevated' : 'Normal';
+  return r.v >= 126 ? 'High' : r.v >= 100 ? 'Elevated' : 'Normal';
+}
+function hrCat(r) { return r.bpm > 100 ? 'High' : r.bpm < 60 ? 'Low' : 'Normal'; }
+var CATB = { Normal: ['b-success', 'check'], Elevated: ['b-warning', 'up'], High: ['b-danger', 'alert'], Low: ['b-info', 'down'] };
+function catBadge(c) { var b = CATB[c]; return '<span class="badge ' + b[0] + '">' + ic(b[1]) + c + '</span>'; }
+
+/* ---------- State ---------- */
+var S = { tab: 'overview', vitals: 'bp', range: '30d', from: null, to: null, rangeErr: '', mode: 'sample', theme: 'system', sex: 'female', sugarCtx: 'all', page: {}, size: {} };
+try { var saved = JSON.parse(localStorage.getItem('fitlog360') || '{}'); if (saved.theme) S.theme = saved.theme; } catch (e) {}
+var TABS = [
+  { id: 'overview', label: 'Overview' }, { id: 'workout', label: 'Workout Plan' }, { id: 'diet', label: 'Diet Plan' },
+  { id: 'vitals', label: 'Vitals', isNew: true }, { id: 'activity', label: 'Activity & Habits', isNew: true },
+  { id: 'mood', label: 'Mood', isNew: true }, { id: 'menstrual', label: 'Menstrual', isNew: true, female: true }
+];
+function visibleTabs() { return TABS.filter(function (t) { return !t.female || S.sex === 'female'; }); }
+function rangeBounds() {
+  if (S.range === 'custom' && S.from && S.to) return { from: S.from, to: new Date(S.to.getTime() + DAY - 1) };
+  var days = S.range === '7d' ? 7 : S.range === '90d' ? 90 : 30;
+  return { from: new Date(T0.getTime() - (days - 1) * DAY), to: new Date(T0.getTime() + DAY - 1) };
+}
+function inRange(list) { var b = rangeBounds(); return list.filter(function (r) { return r.t >= b.from && r.t <= b.to; }); }
+function rangeDays() { var b = rangeBounds(); return Math.round((b.to - b.from) / DAY); }
+// Which data states to show for a tab
+function stateFor(tab) {
+  if (S.mode === 'loading') return 'loading';
+  if (S.mode === 'empty') return 'empty';
+  if (S.mode === 'sample' && (tab === 'diet' || tab === 'menstrual')) return 'empty';
+  return 'populated';
+}
+
+/* ---------- Charts ---------- */
+var charts = [];
+function destroyCharts() { charts.forEach(function (c) { c.destroy(); }); charts = []; }
+var hasChart = typeof window.Chart !== 'undefined';
+if (hasChart) {
+  Chart.register({
+    id: 'refs',
+    beforeDatasetsDraw: function (chart, args, o) {
+      if (!o || (!o.bands && !o.lines)) return;
+      var ctx = chart.ctx, a = chart.chartArea, y = chart.scales.y;
+      ctx.save();
+      (o.bands || []).forEach(function (b) {
+        var y1 = y.getPixelForValue(b.to), y2 = y.getPixelForValue(b.from);
+        ctx.fillStyle = b.color; ctx.globalAlpha = .55; ctx.fillRect(a.left, y1, a.right - a.left, y2 - y1); ctx.globalAlpha = 1;
+        if (b.label) { ctx.fillStyle = tok('muted'); ctx.font = '500 11px Geist, system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(b.label, a.left + 6, y1 + 13); }
+      });
+      (o.lines || []).forEach(function (l) {
+        var py = y.getPixelForValue(l.y);
+        ctx.strokeStyle = l.color; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke(); ctx.setLineDash([]);
+        if (l.label) { ctx.fillStyle = l.color; ctx.font = '600 11px Geist, system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText(l.label, a.right - 4, py - 5); }
+      });
+      ctx.restore();
+    }
+  });
+}
+function baseOpts(xTitle, yTitle) {
+  var grid = tok('chart-grid') || tok('border'), tick = tok('subtle'), muted = tok('muted');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return {
+    responsive: true, maintainAspectRatio: false, animation: reduce ? false : { duration: 300 },
+    interaction: { mode: 'nearest', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor: tok('ink'), titleColor: tok('bg-surface'), bodyColor: tok('bg-surface'), padding: 10, cornerRadius: 8, displayColors: true, boxPadding: 4,
+        titleFont: { family: 'Geist, system-ui, sans-serif', weight: '600', size: 12 }, bodyFont: { family: 'Geist, system-ui, sans-serif', size: 12 } }
+    },
+    scales: {
+      x: { grid: { color: grid, drawTicks: false }, border: { color: grid }, ticks: { color: tick, font: { family: 'Geist, system-ui, sans-serif', size: 12 }, padding: 6 },
+        title: { display: true, text: xTitle, color: muted, font: { family: 'Geist, system-ui, sans-serif', size: 12 } } },
+      y: { grid: { color: grid, drawTicks: false }, border: { display: false }, ticks: { color: tick, font: { family: 'Geist, system-ui, sans-serif', size: 12 }, padding: 6 },
+        title: { display: true, text: yTitle, color: muted, font: { family: 'Geist, system-ui, sans-serif', size: 12 } } }
+    }
+  };
+}
+function xLinear(o) {
+  var b = rangeBounds(), days = Math.max(1, Math.round((b.to - b.from) / DAY));
+  o.scales.x.type = 'linear'; o.scales.x.min = 0; o.scales.x.max = days;
+  o.scales.x.ticks.stepSize = days <= 8 ? 1 : days <= 31 ? 5 : 15;
+  o.scales.x.ticks.callback = function (v) { return fmtD(new Date(b.from.getTime() + v * DAY)); };
+  return function (t) { return (t - b.from) / DAY; };
+}
+function mkChart(id, cfg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (!hasChart) { el.parentNode.innerHTML = '<div class="empty" style="padding:24px"><p class="t-small">Charts need Chart.js, which didn’t load. The table below shows every reading.</p></div>'; return; }
+  charts.push(new Chart(el.getContext('2d'), cfg));
+}
+
+/* ---------- Tables with server-style pagination ---------- */
+var TABLES = {};
+function tableHTML(key) { return '<div id="tbl-' + key + '"></div>'; }
+function renderTable(key) {
+  var cfg = TABLES[key], host = document.getElementById('tbl-' + key);
+  if (!cfg || !host) return;
+  var size = S.size[key] || 10, total = cfg.rows.length, pages = Math.max(1, Math.ceil(total / size));
+  var page = clamp(S.page[key] || 1, 1, pages); S.page[key] = page;
+  var start = (page - 1) * size, slice = cfg.rows.slice(start, start + size);
+  var h = '<div class="tablewrap" role="region" tabindex="0" aria-label="' + esc(cfg.caption) + ', scrollable"><table><caption class="sr">' + esc(cfg.caption) + '</caption><thead><tr>';
+  cfg.cols.forEach(function (c) { h += '<th scope="col"' + (c.r ? ' class="r"' : '') + '>' + c.h + '</th>'; });
+  h += '</tr></thead><tbody>';
+  slice.forEach(function (row) { h += '<tr>'; cfg.cols.forEach(function (c) { h += '<td' + (c.r ? ' class="r"' : '') + '>' + c.f(row) + '</td>'; }); h += '</tr>'; });
+  h += '</tbody></table><div class="pager"><span class="num">Showing ' + (total ? start + 1 : 0) + '–' + Math.min(start + size, total) + ' of ' + n(total) + '</span><span class="pager__r">' +
+    '<label class="t-small" style="display:flex;align-items:center;gap:6px">Rows per page <select class="sel" data-size="' + key + '">' +
+    [10, 25, 50].map(function (s) { return '<option' + (s === size ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></label>' +
+    '<button type="button" class="iconbtn" style="width:32px;height:32px" data-page="' + key + ':1" aria-label="First page"' + (page === 1 ? ' disabled' : '') + '>' + ic('first') + '</button>' +
+    '<button type="button" class="iconbtn" style="width:32px;height:32px" data-page="' + key + ':' + (page - 1) + '" aria-label="Previous page"' + (page === 1 ? ' disabled' : '') + '>' + ic('chevl') + '</button>' +
+    '<span class="num" aria-live="polite">Page ' + page + ' of ' + pages + '</span>' +
+    '<button type="button" class="iconbtn" style="width:32px;height:32px" data-page="' + key + ':' + (page + 1) + '" aria-label="Next page"' + (page === pages ? ' disabled' : '') + '>' + ic('chevr') + '</button>' +
+    '<button type="button" class="iconbtn" style="width:32px;height:32px" data-page="' + key + ':' + pages + '" aria-label="Last page"' + (page === pages ? ' disabled' : '') + '>' + ic('last') + '</button>' +
+    '</span></div></div>';
+  host.innerHTML = h;
+}
+function defTable(key, caption, cols, rows) { TABLES[key] = { caption: caption, cols: cols, rows: rows }; }
+function resetPages() { S.page = {}; }
+
+/* ---------- Building blocks ---------- */
+function card(eyebrow, body, opts) {
+  opts = opts || {};
+  return '<section class="card' + (opts.cls ? ' ' + opts.cls : '') + '"' + (opts.style ? ' style="' + opts.style + '"' : '') + ' aria-label="' + esc(opts.aria || eyebrow) + '"><div class="card__top"><div class="eyebrow"><span class="t-overline">' + eyebrow + '</span>' + (opts.right || '') + '</div><hr class="divider"></div>' + body + '</section>';
+}
+function emptyBlock(icon, title, text, action) {
+  return '<div class="empty"><span class="empty__ic">' + ic(icon, 'ic-md') + '</span><p class="t-h3" style="color:var(--ink)">' + title + '</p><p class="t-body">' + text + '</p>' + (action || '') + '</div>';
+}
+function rangeEmpty(what) {
+  return emptyBlock('calendar', 'No ' + what + ' in this range', 'Nothing was logged between ' + rangeLabel() + '.', S.range !== '90d' ? '<button type="button" class="btn btn--secondary btn--sm" data-range="90d">Show last 90 days</button>' : '');
+}
+function rangeLabel() { var b = rangeBounds(); return fmtD(b.from) + ' and ' + fmtDY(b.to); }
+function seg(name, opts, value, label, cls) {
+  return '<div class="' + (cls || 'seg') + '" role="radiogroup" aria-label="' + esc(label) + '" data-radio="' + name + '">' + opts.map(function (o) {
+    var on = o[0] === value;
+    return '<button type="button" role="radio" aria-checked="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-val="' + o[0] + '">' + o[1] + '</button>';
+  }).join('') + '</div>';
+}
+function controlsBar() {
+  var b = rangeBounds();
+  var custom = S.range === 'custom' ? '<div class="custom"><div class="field"><label class="t-caption muted" for="dFrom">From</label><input type="date" id="dFrom" min="' + iso(new Date(T0.getTime() - 89 * DAY)) + '" max="' + iso(T0) + '" value="' + iso(S.from || b.from) + '"></div>' +
+    '<div class="field"><label class="t-caption muted" for="dTo">To</label><input type="date" id="dTo" min="' + iso(new Date(T0.getTime() - 89 * DAY)) + '" max="' + iso(T0) + '" value="' + iso(S.to || T0) + '"></div>' +
+    '<button type="button" class="btn btn--secondary btn--sm" id="applyRange">Apply</button>' + (S.rangeErr ? '<span class="t-caption field__err" role="alert">' + S.rangeErr + '</span>' : '') + '</div>' : '';
+  return '<div class="controls"><div class="controls__l">' + seg('range', [['7d', '7d'], ['30d', '30d'], ['90d', '90d'], ['custom', 'Custom']], S.range, 'Date range') + custom +
+    '<span class="t-small rangeinfo num">' + fmtD(b.from) + ' – ' + fmtDY(b.to) + ' · ' + rangeDays() + ' days</span></div>' +
+    '<span class="ro">' + ic('lock') + 'Read-only view. Access is audited.</span></div>';
+}
+function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function legend(items) {
+  return '<ul class="legend" aria-hidden="true">' + items.map(function (it) {
+    if (it.band) return '<li><span class="lg-band" style="background:' + it.band + '"></span>' + it.label + '</li>';
+    return '<li><span class="lg-line ' + (it.dash ? 'lg-dash' : it.dot ? 'lg-dot' : '') + '" style="border-color:var(--' + it.color + ')"></span>' + it.label + '</li>';
+  }).join('') + '</ul>';
+}
+function stat(label, value, sub) { return '<div class="stat"><span class="t-small muted">' + label + '</span><span class="t-metric num">' + value + '</span>' + (sub ? '<span class="t-caption subtle">' + sub + '</span>' : '') + '</div>'; }
+function chartBox(id, aria) { return '<div class="chartbox"><canvas id="' + id + '" role="img" aria-label="' + esc(aria) + '"></canvas></div>'; }
+
+/* ---------- Skeletons ---------- */
+function sk(w, h, extra) { return '<div class="skel" style="width:' + w + ';height:' + h + 'px;' + (extra || '') + '"></div>'; }
+function skeleton(tab) {
+  var ctrl = TABS.filter(function (t) { return t.id === tab; })[0].isNew ? '<div class="controls">' + sk('260px', 32) + sk('230px', 30) + '</div>' : '';
+  var cardSk = function (h) { return '<div class="card">' + sk('110px', 12) + '<hr class="divider">' + sk('40%', 28) + sk('100%', h) + '</div>'; };
+  var body;
+  if (tab === 'overview') body = '<div class="tiles">' + [1, 2, 3, 4, 5, 6].map(function () { return '<div class="tile" style="cursor:default">' + sk('60%', 12) + sk('70%', 24) + sk('50%', 16) + '</div>'; }).join('') + '</div><div class="grid g3">' + cardSk(160) + cardSk(160) + cardSk(160) + '</div>';
+  else if (tab === 'mood') body = '<div class="grid g2">' + cardSk(120) + cardSk(220) + '</div>' + cardSk(260);
+  else body = cardSk(280) + '<div class="card">' + [1, 2, 3, 4, 5].map(function () { return sk('100%', 18); }).join('') + '</div>';
+  return '<div aria-busy="true" aria-label="Loading ' + tab + '" style="display:flex;flex-direction:column;gap:var(--space-5)">' + ctrl + body + '</div>';
+}
+
+/* ---------- Overview ---------- */
+function latestTiles(st) {
+  var empty = st === 'empty';
+  function tile(goto, icon, label, value, badge, when) {
+    return '<button type="button" class="tile" data-goto="' + goto + '" aria-label="' + esc(label + ': ' + (empty ? 'no readings' : value.replace(/<[^>]+>/g, '')) + '. Open ' + label + ' details') + '">' +
+      '<span class="tile__label">' + ic(icon) + label + '<span class="tile__go">' + ic('chevr') + '</span></span>' +
+      (empty ? '<span class="t-metric subtle">—</span><span class="t-caption subtle">No readings yet</span>' : '<span class="t-metric num">' + value + '</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' + (badge || '') + '<span class="t-caption subtle">' + when + '</span></span>') + '</button>';
+  }
+  var bp = BP[0], su = SUGAR[0], hr = HR[0], a = ACT[0], m = MOOD[0];
+  return '<div class="tiles">' +
+    tile('vitals:bp', 'pulse', 'Blood pressure', bp.sys + '/' + bp.dia + ' <span class="t-small muted">mmHg</span>', catBadge(bpCat(bp)), rel(bp.t)) +
+    tile('vitals:sugar', 'droplet', 'Blood sugar', su.v + ' <span class="t-small muted">mg/dL</span>', catBadge(sugarCat(su)), CTX[su.ctx] + ' · ' + rel(su.t)) +
+    tile('vitals:hr', 'heart', 'Heart rate', hr.bpm + ' <span class="t-small muted">bpm</span>', catBadge(hrCat(hr)), rel(hr.t)) +
+    tile('activity', 'bolt', 'Steps today', n(a.steps) + ' <span class="t-small muted">/ ' + n(STEP_GOAL) + '</span>', '<span class="badge b-neutral num">' + Math.round(a.steps / STEP_GOAL * 100) + '% of goal</span>', 'as of ' + fmtT(TODAY)) +
+    tile('activity', 'droplet', 'Water today', a.water + ' <span class="t-small muted">/ ' + WATER_GOAL + ' glasses</span>', '<span class="badge b-neutral num">' + Math.round(a.water / WATER_GOAL * 100) + '% of goal</span>', 'as of ' + fmtT(TODAY)) +
+    tile('mood', 'moon', 'Latest mood', MOODBY[m.mood].label, moodBadge(m.mood), rel(m.t)) +
+    '</div>';
+}
+function viewOverview(st) {
+  var menst = S.sex === 'female' ? (stateFor('menstrual') === 'populated' ? 'Created · Oct 23, 2026' : 'Not created') : 'Not applicable';
+  return {
+    html: '<div style="display:flex;flex-direction:column;gap:var(--space-3)"><div class="card__head"><h2 class="t-h2">Latest readings</h2><span class="t-small subtle">Most recent log per metric · select a tile for details</span></div>' + latestTiles(st) + '</div>' +
+      '<div class="grid g3">' +
+      card('Profile', '<dl class="dl"><dt>Name</dt><dd>Priya Sharma</dd><dt>Mobile</dt><dd>+91 98•••• 3021</dd><dt>Email</dt><dd>priya.s•••@gmail.com</dd><dt>Gender · Age</dt><dd>Female · 25</dd><dt>Height</dt><dd>160 cm</dd><dt>Weight</dt><dd>69.80 kg</dd><dt>Goal</dt><dd>Weight loss</dd><dt>Profession</dt><dd>Software / IT</dd><dt>Physical issues</dt><dd>Lower back pain</dd></dl>') +
+      card('Preferences', '<dl class="dl"><dt>Steps goal</dt><dd>' + n(STEP_GOAL) + ' / day</dd><dt>Water goal</dt><dd>' + WATER_GOAL + ' glasses / day</dd><dt>Exercise days</dt><dd>4 per week · Mon, Wed, Fri, Sat</dd><dt>Session length</dt><dd>30 min</dd><dt>Preferred time</dt><dd>Morning, 06:30</dd><dt>Diet type</dt><dd>Vegetarian</dd></dl>') +
+      card('Account status', '<dl class="dl"><dt>Registration</dt><dd>Complete · Aug 14, 2026</dd><dt>Plan</dt><dd>Free</dd><dt>Login</dt><dd>Allowed</dd><dt>Menstrual profile</dt><dd>' + menst + '</dd><dt>Push token</dt><dd>Present · Nov 4</dd><dt>Device</dt><dd>Android · app v3.8.0</dd><dt>Last active</dt><dd>12 min ago</dd></dl>') +
+      '</div>'
+  };
+}
+
+/* ---------- Workout plan ---------- */
+function viewWorkout(st) {
+  if (st === 'empty') return { html: card('Workout plan', emptyBlock('plans', 'No workout plan assigned yet', 'A plan is created when the user finishes onboarding or picks a template in the app.')) };
+  var ex = [['Jumping jacks', 'Warm-up', '1 × 60 s', '8'], ['Bodyweight squat', 'Legs', '3 × 12', '24'], ['Knee push-up', 'Chest', '3 × 10', '18'], ['Glute bridge', 'Glutes', '3 × 15', '20'], ['Plank', 'Core', '3 × 30 s', '15'], ['Bird dog', 'Core', '3 × 10 each side', '12'], ['Cool-down stretch', 'Full body', '1 × 3 min', '6']];
+  defTable('workout', 'Exercises in today’s session', [
+    { h: '#', f: function (r) { return '<span class="num subtle">' + r.i + '</span>'; } },
+    { h: 'Exercise', f: function (r) { return '<span class="t-strong">' + r[0] + '</span>'; } },
+    { h: 'Focus', f: function (r) { return r[1]; } },
+    { h: 'Sets × reps', f: function (r) { return '<span class="num">' + r[2] + '</span>'; } },
+    { h: 'Calories', r: 1, f: function (r) { return r[3] + ' kcal'; } }
+  ], ex.map(function (e, i) { var o = e.slice(); o.i = i + 1; return o; }));
+  var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], on = { Mon: 1, Wed: 1, Fri: 1, Sat: 1 };
+  return {
+    html: '<div class="grid g2">' +
+      card('Current plan', '<div class="card__head"><div><p class="t-h3">Full body foundations</p><p class="t-small muted">Beginner · Weight loss · customised by user</p></div><span class="badge b-success">' + ic('check') + 'Active</span></div>' +
+        '<div class="grid g3" style="gap:var(--space-3)">' + stat('Plan period', 'Nov 1 – 30', 'Day 6 of 30') + stat('Sessions', '2 / 17', 'Today’s session pending') + stat('Per session', '30 min', '≈ 103 kcal') + '</div>') +
+      card('Weekly schedule', '<div style="display:flex;gap:8px;flex-wrap:wrap">' + days.map(function (d) { return '<span class="badge ' + (on[d] ? 'b-success' : 'b-neutral') + '" style="height:32px;padding:0 12px">' + (on[d] ? ic('check') : '') + d + (on[d] ? '' : ' · rest') + '</span>'; }).join('') + '</div><p class="t-small muted">Preferred time: Morning, 06:30. Reminders go out 15 minutes before.</p>') +
+      '</div>' + card('Today’s session · Friday', tableHTML('workout')),
+    after: function () { renderTable('workout'); }
+  };
+}
+
+/* ---------- Diet plan ---------- */
+function viewDiet(st) {
+  if (st === 'empty') return { html: card('Diet plan', emptyBlock('nutrition', 'No diet plans assigned yet', 'Diet plans are generated by FitLog AI when the user requests one in the app. They are not created or edited here.')) };
+  var meals = [['Breakfast', '07:30', 'Vegetable poha with peanuts, 1 glass low-fat milk', 340], ['Mid-morning', '10:30', 'Apple and 10 almonds', 160], ['Lunch', '13:00', '2 multigrain rotis, moong dal, lauki sabzi, salad', 450], ['Evening', '17:00', 'Roasted chana, green tea', 140], ['Dinner', '20:00', 'Paneer bhurji, 1 roti, cucumber raita', 360]];
+  defTable('diet', 'Daily meals', [
+    { h: 'Meal', f: function (r) { return '<span class="t-strong">' + r[0] + '</span>'; } }, { h: 'Time', f: function (r) { return '<span class="num">' + r[1] + '</span>'; } },
+    { h: 'Menu', f: function (r) { return r[2]; } }, { h: 'Calories', r: 1, f: function (r) { return r[3] + ' kcal'; } }
+  ], meals);
+  return {
+    html: card('Diet plan', '<div class="card__head"><div><p class="t-h3">Vegetarian weight-loss plan</p><p class="t-small muted">1,450 kcal / day · Generated Nov 2 · Nov 2 – Nov 15</p></div><span class="badge b-info">' + ic('sparkle') + 'AI-generated</span></div>' + tableHTML('diet')),
+    after: function () { renderTable('diet'); }
+  };
+}
+
+/* ---------- Vitals ---------- */
+function viewVitals(st) {
+  var sub = seg('vitals', [['bp', 'Blood pressure'], ['sugar', 'Blood sugar'], ['hr', 'Heart rate']], S.vitals, 'Vital sign', 'pills');
+  var out = { html: controlsBar() + sub, after: null };
+  var empty = st === 'empty';
+  if (S.vitals === 'bp') {
+    var rows = empty ? [] : inRange(BP);
+    if (!rows.length) { out.html += card('Blood pressure', empty ? emptyBlock('pulse', 'No blood pressure readings yet', 'Readings appear here when the user logs them in the app or syncs a BP monitor.') : rangeEmpty('blood pressure readings')); return out; }
+    var last = rows[0], high = rows.filter(function (r) { return bpCat(r) === 'High'; }).length, elev = rows.filter(function (r) { return bpCat(r) === 'Elevated'; }).length;
+    var avgS = Math.round(rows.reduce(function (a, r) { return a + r.sys; }, 0) / rows.length), avgD = Math.round(rows.reduce(function (a, r) { return a + r.dia; }, 0) / rows.length);
+    var sysVals = rows.map(function (r) { return r.sys; }), diaVals = rows.map(function (r) { return r.dia; });
+    var aria = 'Blood pressure line chart, ' + rows.length + ' readings from ' + rangeLabel() + '. Systolic ' + Math.min.apply(null, sysVals) + ' to ' + Math.max.apply(null, sysVals) + ' mmHg, diastolic ' + Math.min.apply(null, diaVals) + ' to ' + Math.max.apply(null, diaVals) + ' mmHg. ' + high + ' High and ' + elev + ' Elevated readings.';
+    out.html += '<div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">' +
+      card('Latest reading', '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span class="t-metric-lg num">' + last.sys + '/' + last.dia + '</span><span class="t-small muted">mmHg</span>' + catBadge(bpCat(last)) + '</div><p class="t-small subtle">' + fmtDT(last.t) + ' · ' + rel(last.t) + '</p>') +
+      card('In this range', '<div class="grid g3" style="gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))">' + stat('Average', avgS + '/' + avgD, 'mmHg') + stat('Readings', rows.length, rangeDays() + ' days') + stat('Above normal', high + elev, high + ' High · ' + elev + ' Elevated') + '</div>') + '</div>' +
+      card('Blood pressure trend', legend([{ color: 'chart-4', label: 'Systolic' }, { color: 'chart-4', dash: 1, label: 'Diastolic' }, { band: 'var(--success-bg)', label: 'Normal systolic (90–119)' }, { color: 'warning-text', dash: 1, label: 'Diastolic limit 80' }]) + chartBox('cBP', aria) +
+        '<p class="t-caption subtle">Categories: Normal &lt;120/&lt;80 · Elevated 120–129/&lt;80 · High ≥130 or ≥80 mmHg.</p>') +
+      card('Readings', tableHTML('bp'));
+    defTable('bp', 'Blood pressure readings', [
+      { h: 'Date and time', f: function (r) { return '<span class="num">' + fmtDT(r.t) + '</span>'; } },
+      { h: 'Systolic (mmHg)', r: 1, f: function (r) { return r.sys; } },
+      { h: 'Diastolic (mmHg)', r: 1, f: function (r) { return r.dia; } },
+      { h: 'Category', f: function (r) { return catBadge(bpCat(r)); } }
+    ], rows);
+    out.after = function () {
+      var o = baseOpts('Date', 'Blood pressure (mmHg)'), X = xLinear(o), asc = rows.slice().reverse(), c4 = tok('chart-4');
+      o.scales.y.min = 50; o.scales.y.max = 160;
+      o.plugins.refs = { bands: [{ from: 90, to: 119, color: tok('success-bg'), label: 'Normal systolic' }], lines: [{ y: 80, color: tok('warning-text'), label: 'Diastolic limit 80' }] };
+      o.plugins.tooltip.callbacks = { title: function (it) { return fmtDT(it[0].raw.t); }, label: function (it) { return ' ' + it.dataset.label + ': ' + it.raw.y + ' mmHg'; }, afterBody: function (it) { return 'Category: ' + bpCat(it[0].raw.r); } };
+      mkChart('cBP', { type: 'line', data: { datasets: [
+        { label: 'Systolic', data: asc.map(function (r) { return { x: X(r.t), y: r.sys, t: r.t, r: r }; }), borderColor: c4, backgroundColor: c4, borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5, tension: .25 },
+        { label: 'Diastolic', data: asc.map(function (r) { return { x: X(r.t), y: r.dia, t: r.t, r: r }; }), borderColor: c4, backgroundColor: c4, borderWidth: 2, borderDash: [6, 4], pointStyle: 'triangle', pointRadius: 3, pointHoverRadius: 5, tension: .25 }
+      ] }, options: o });
+      renderTable('bp');
+    };
+  } else if (S.vitals === 'sugar') {
+    var all = empty ? [] : inRange(SUGAR);
+    var rowsS = S.sugarCtx === 'all' ? all : all.filter(function (r) { return r.ctx === S.sugarCtx; });
+    var filt = seg('sugarCtx', [['all', 'All'], ['fasting', 'Fasting'], ['beforeMeal', 'Before meal'], ['afterMeal', 'After meal']], S.sugarCtx, 'Meal context', 'pills');
+    if (!all.length) { out.html += card('Blood sugar', empty ? emptyBlock('droplet', 'No blood sugar readings yet', 'Readings appear here when the user logs them in the app or syncs a glucometer.') : rangeEmpty('blood sugar readings')); return out; }
+    var lastS = all[0];
+    var flagged = rowsS.filter(function (r) { return sugarCat(r) !== 'Normal'; }).length;
+    var fast = all.filter(function (r) { return r.ctx === 'fasting'; });
+    var avgF = fast.length ? Math.round(fast.reduce(function (a, r) { return a + r.v; }, 0) / fast.length) : '—';
+    out.html += '<div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">' +
+      card('Latest reading', '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span class="t-metric-lg num">' + lastS.v + '</span><span class="t-small muted">mg/dL · ' + CTX[lastS.ctx] + '</span>' + catBadge(sugarCat(lastS)) + '</div><p class="t-small subtle">' + fmtDT(lastS.t) + ' · ' + rel(lastS.t) + '</p>') +
+      card('In this range', '<div class="grid" style="gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))">' + stat('Avg fasting', avgF, 'mg/dL') + stat('Readings', rowsS.length, S.sugarCtx === 'all' ? 'all contexts' : CTX[S.sugarCtx]) + stat('Outside normal', flagged, 'Low, Elevated or High') + '</div>') + '</div>' +
+      card('Blood sugar trend', '<div class="card__head">' + filt + legend([{ color: 'chart-2', label: 'Fasting' }, { color: 'chart-3', dash: 1, label: 'Before meal' }, { color: 'chart-5', dot: 1, label: 'After meal' }]) + '</div>' +
+        (rowsS.length ? chartBox('cSugar', 'Blood sugar chart, ' + rowsS.length + ' ' + (S.sugarCtx === 'all' ? '' : CTX[S.sugarCtx].toLowerCase() + ' ') + 'readings from ' + rangeLabel() + ', values ' + Math.min.apply(null, rowsS.map(function (r) { return r.v; })) + ' to ' + Math.max.apply(null, rowsS.map(function (r) { return r.v; })) + ' mg/dL, ' + flagged + ' outside normal.') : rangeEmpty(CTX[S.sugarCtx].toLowerCase() + ' readings')) +
+        '<p class="t-caption subtle">Fasting and before meal: Normal 70–99 · Elevated 100–125 · High ≥126. After meal: Normal &lt;140 · Elevated 140–199 · High ≥200. Low &lt;70 mg/dL.</p>') +
+      card('Readings', tableHTML('sugar'));
+    defTable('sugar', 'Blood sugar readings', [
+      { h: 'Date and time', f: function (r) { return '<span class="num">' + fmtDT(r.t) + '</span>'; } },
+      { h: 'Value (mg/dL)', r: 1, f: function (r) { return r.v; } },
+      { h: 'Meal context', f: function (r) { return CTX[r.ctx]; } },
+      { h: 'Category', f: function (r) { return catBadge(sugarCat(r)); } }
+    ], rowsS);
+    out.after = function () {
+      if (rowsS.length) {
+        var o = baseOpts('Date', 'Blood sugar (mg/dL)'), X = xLinear(o);
+        o.scales.y.min = 50; o.scales.y.max = 230;
+        var lines = [];
+        if (S.sugarCtx !== 'afterMeal') lines.push({ y: 100, color: tok('warning-text'), label: 'Fasting limit 100' });
+        if (S.sugarCtx === 'all' || S.sugarCtx === 'afterMeal') lines.push({ y: 140, color: tok('warning-text'), label: 'After-meal limit 140' });
+        lines.push({ y: 70, color: tok('info-text'), label: 'Low 70' });
+        o.plugins.refs = { lines: lines };
+        o.plugins.tooltip.callbacks = { title: function (it) { return fmtDT(it[0].raw.t); }, label: function (it) { return ' ' + it.dataset.label + ': ' + it.raw.y + ' mg/dL (' + sugarCat(it.raw.r) + ')'; } };
+        var spec = { fasting: ['chart-2', [], 'circle'], beforeMeal: ['chart-3', [6, 4], 'triangle'], afterMeal: ['chart-5', [2, 4], 'rect'] };
+        var ds = Object.keys(spec).filter(function (k) { return S.sugarCtx === 'all' || S.sugarCtx === k; }).map(function (k) {
+          var c = tok(spec[k][0]);
+          return { label: CTX[k], data: rowsS.filter(function (r) { return r.ctx === k; }).reverse().map(function (r) { return { x: X(r.t), y: r.v, t: r.t, r: r }; }), borderColor: c, backgroundColor: c, borderWidth: 2, borderDash: spec[k][1], pointStyle: spec[k][2], pointRadius: 3, pointHoverRadius: 5, tension: .25 };
+        });
+        mkChart('cSugar', { type: 'line', data: { datasets: ds }, options: o });
+      }
+      renderTable('sugar');
+    };
+  } else {
+    var rowsH = empty ? [] : inRange(HR);
+    if (!rowsH.length) { out.html += card('Heart rate', empty ? emptyBlock('heart', 'No heart rate readings yet', 'Readings appear here when the user logs them or syncs a wearable.') : rangeEmpty('heart rate readings')); return out; }
+    var bpms = rowsH.map(function (r) { return r.bpm; }), mn = Math.min.apply(null, bpms), mx = Math.max.apply(null, bpms), av = Math.round(bpms.reduce(function (a, b) { return a + b; }, 0) / bpms.length);
+    var minR = rowsH.filter(function (r) { return r.bpm === mn; })[0], maxR = rowsH.filter(function (r) { return r.bpm === mx; })[0];
+    out.html += '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">' +
+      card('Latest', '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span class="t-metric-lg num">' + rowsH[0].bpm + '</span><span class="t-small muted">bpm</span>' + catBadge(hrCat(rowsH[0])) + '</div><p class="t-small subtle">' + rel(rowsH[0].t) + '</p>') +
+      card('Average', '<div style="display:flex;align-items:baseline;gap:8px"><span class="t-metric-lg num">' + av + '</span><span class="t-small muted">bpm</span></div><p class="t-small subtle">' + rowsH.length + ' readings</p>') +
+      card('Minimum', '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span class="t-metric-lg num">' + mn + '</span><span class="t-small muted">bpm</span>' + catBadge(hrCat(minR)) + '</div><p class="t-small subtle">' + fmtDT(minR.t) + '</p>') +
+      card('Maximum', '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span class="t-metric-lg num">' + mx + '</span><span class="t-small muted">bpm</span>' + catBadge(hrCat(maxR)) + '</div><p class="t-small subtle">' + fmtDT(maxR.t) + '</p>') + '</div>' +
+      card('Heart rate trend', legend([{ color: 'chart-3', label: 'Heart rate' }, { band: 'var(--success-bg)', label: 'Normal resting range (60–100)' }]) + chartBox('cHR', 'Heart rate chart, ' + rowsH.length + ' readings from ' + rangeLabel() + ', ' + mn + ' to ' + mx + ' bpm, average ' + av + ' bpm.')) +
+      card('Readings', tableHTML('hr'));
+    defTable('hr', 'Heart rate readings', [
+      { h: 'Date and time', f: function (r) { return '<span class="num">' + fmtDT(r.t) + '</span>'; } },
+      { h: 'Heart rate (bpm)', r: 1, f: function (r) { return r.bpm; } },
+      { h: 'Category', f: function (r) { return catBadge(hrCat(r)); } }
+    ], rowsH);
+    out.after = function () {
+      var o = baseOpts('Date', 'Heart rate (bpm)'), X = xLinear(o), c = tok('chart-3');
+      o.scales.y.min = 40; o.scales.y.max = 130;
+      o.plugins.refs = { bands: [{ from: 60, to: 100, color: tok('success-bg'), label: 'Normal resting range' }] };
+      o.plugins.tooltip.callbacks = { title: function (it) { return fmtDT(it[0].raw.t); }, label: function (it) { return ' Heart rate: ' + it.raw.y + ' bpm (' + hrCat(it.raw.r) + ')'; } };
+      mkChart('cHR', { type: 'line', data: { datasets: [{ label: 'Heart rate', data: rowsH.slice().reverse().map(function (r) { return { x: X(r.t), y: r.bpm, t: r.t, r: r }; }), borderColor: c, backgroundColor: c, borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5, tension: .25 }] }, options: o });
+      renderTable('hr');
+    };
+  }
+  return out;
+}
+
+/* ---------- Activity & habits ---------- */
+function meter(label, value, goal, unit) {
+  var pct = Math.round(value / goal * 100), met = value >= goal;
+  return '<div class="meter"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><span><span class="t-metric-lg num">' + n(value) + '</span> <span class="t-small muted">of ' + n(goal) + ' ' + unit + '</span></span>' +
+    (met ? '<span class="badge b-success">' + ic('check') + 'Goal met</span>' : '<span class="badge b-neutral num">' + pct + '% · ' + n(goal - value) + ' to go</span>') + '</div>' +
+    '<div class="meter__track" role="meter" aria-label="' + esc(label) + '" aria-valuemin="0" aria-valuemax="' + goal + '" aria-valuenow="' + value + '" aria-valuetext="' + n(value) + ' of ' + n(goal) + ' ' + unit + ', ' + pct + ' percent"><div class="meter__fill" style="width:' + Math.min(100, pct) + '%"></div></div><span class="t-caption subtle">Today as of ' + fmtT(TODAY) + '</span></div>';
+}
+function viewActivity(st) {
+  var out = { html: controlsBar() };
+  var rows = st === 'empty' ? [] : inRange(ACT);
+  if (!rows.length) { out.html += '<div class="grid g2">' + card('Steps', emptyBlock('bolt', 'No step data yet', 'Steps appear once the user allows step tracking or connects Google Fit / Apple Health.')) + card('Water intake', emptyBlock('droplet', 'No water logs yet', 'Glasses appear here as the user logs them in the app.')) + '</div>'; return out; }
+  var today = ACT[0], past = rows.filter(function (r) { return r.t < T0; });
+  var avgSteps = past.length ? Math.round(past.reduce(function (a, r) { return a + r.steps; }, 0) / past.length) : today.steps;
+  var metSteps = past.filter(function (r) { return r.steps >= STEP_GOAL; }).length;
+  var avgW = past.length ? (past.reduce(function (a, r) { return a + r.water; }, 0) / past.length).toFixed(1) : today.water;
+  var metW = past.filter(function (r) { return r.water >= WATER_GOAL; }).length;
+  var adh = past.length ? Math.round(metW / past.length * 100) : 0;
+  out.html += '<div class="grid g2">' +
+    card('Steps', meter('Steps today', today.steps, STEP_GOAL, 'steps') + '<div class="grid" style="gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))">' + stat('Average per day', n(avgSteps), 'completed days in range') + stat('Days goal met', metSteps + ' / ' + past.length, Math.round(metSteps / Math.max(1, past.length) * 100) + '% of days') + '</div>' +
+      legend([{ color: 'chart-1', label: 'Steps per day' }, { color: 'ink', dash: 1, label: 'Goal 7,000' }]) + chartBox('cSteps', 'Daily steps bar chart from ' + rangeLabel() + '. Average ' + n(avgSteps) + ' steps; goal of 7,000 met on ' + metSteps + ' of ' + past.length + ' days.')) +
+    card('Water intake', meter('Water today', today.water, WATER_GOAL, 'glasses') + '<div class="grid" style="gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))">' + stat('Average per day', avgW, 'glasses') + stat('Adherence', adh + '%', metW + ' of ' + past.length + ' days at 14+ glasses') + '</div>' +
+      legend([{ color: 'chart-2', label: 'Glasses per day' }, { color: 'ink', dash: 1, label: 'Goal 14' }]) + chartBox('cWater', 'Daily water intake bar chart from ' + rangeLabel() + '. Average ' + avgW + ' glasses; goal of 14 met on ' + metW + ' of ' + past.length + ' days.')) +
+    '</div>' + card('Daily log', tableHTML('act'));
+  defTable('act', 'Daily steps and water', [
+    { h: 'Date', f: function (r) { return '<span class="num">' + fmtD(r.t) + (r.t >= T0 ? ' <span class="badge b-neutral">Today</span>' : '') + '</span>'; } },
+    { h: 'Steps', r: 1, f: function (r) { return n(r.steps); } },
+    { h: 'Steps vs goal', f: function (r) { return r.steps >= STEP_GOAL ? '<span class="badge b-success">' + ic('check') + 'Met</span>' : '<span class="badge b-neutral num">' + Math.round(r.steps / STEP_GOAL * 100) + '%</span>'; } },
+    { h: 'Water (glasses)', r: 1, f: function (r) { return r.water; } },
+    { h: 'Water vs goal', f: function (r) { return r.water >= WATER_GOAL ? '<span class="badge b-success">' + ic('check') + 'Met</span>' : '<span class="badge b-neutral num">' + Math.round(r.water / WATER_GOAL * 100) + '%</span>'; } }
+  ], rows);
+  out.after = function () {
+    var asc = rows.slice().reverse(), labels = asc.map(function (r) { return fmtD(r.t); });
+    function bar(id, key, color, goal, yTitle, unit) {
+      var o = baseOpts('Date', yTitle), c = tok(color);
+      o.scales.y.beginAtZero = true; o.scales.x.ticks.maxTicksLimit = 10; o.scales.x.ticks.autoSkip = true; o.scales.x.ticks.maxRotation = 0;
+      o.scales.x.grid.display = false;
+      o.plugins.refs = { lines: [{ y: goal, color: tok('ink'), label: 'Goal ' + n(goal) }] };
+      o.plugins.tooltip.callbacks = { title: function (it) { return fmtDY(asc[it[0].dataIndex].t); }, label: function (it) { var v = it.raw; return ' ' + n(v) + ' ' + unit + (v >= goal ? ' · goal met' : ' · ' + Math.round(v / goal * 100) + '% of goal'); } };
+      if (key === 'steps') o.scales.y.suggestedMax = 12000; else o.scales.y.suggestedMax = 18;
+      mkChart(id, { type: 'bar', data: { labels: labels, datasets: [{ label: yTitle, data: asc.map(function (r) { return r[key]; }), backgroundColor: c, borderRadius: { topLeft: 6, topRight: 6 }, borderSkipped: 'bottom', maxBarThickness: 28 }] }, options: o });
+    }
+    bar('cSteps', 'steps', 'chart-1', STEP_GOAL, 'Steps', 'steps');
+    bar('cWater', 'water', 'chart-2', WATER_GOAL, 'Water (glasses)', 'glasses');
+    renderTable('act');
+  };
+  return out;
+}
+
+/* ---------- Mood ---------- */
+var FACE = { great: 'M8 14c1 2 2.5 3 4 3s3-1 4-3', good: 'M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8', okay: 'M8.5 15h7', low: 'M8.5 16.5c1-1.2 2.2-1.8 3.5-1.8s2.5.6 3.5 1.8', stressed: 'M8 16l2-1.5 2 1.5 2-1.5 2 1.5' };
+function moodIcon(k, size) {
+  return '<svg class="moodic" style="width:' + (size || 24) + 'px;height:' + (size || 24) + 'px;color:var(--' + MOODBY[k].color + ')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9.5h.01M15 9.5h.01" stroke-width="2.5"/><path d="' + FACE[k] + '"/></svg>';
+}
+function moodBadge(k) { return '<span class="badge b-neutral" style="gap:6px">' + moodIcon(k, 16) + MOODBY[k].label + '</span>'; }
+function viewMood(st) {
+  var out = { html: controlsBar() };
+  var rows = st === 'empty' ? [] : inRange(MOOD);
+  if (!rows.length) { out.html += card('Mood', st === 'empty' ? emptyBlock('moon', 'No mood entries yet', 'Entries appear when the user checks in from the Mood screen in the app.') : rangeEmpty('mood entries')); return out; }
+  var counts = MOODS.map(function (m) { return { m: m, c: rows.filter(function (r) { return r.mood === m.key; }).length }; });
+  var total = rows.length;
+  var stack = '<div class="stack" role="img" aria-label="Mood distribution: ' + counts.map(function (x) { return x.m.label + ' ' + x.c + ' (' + Math.round(x.c / total * 100) + '%)'; }).join(', ') + '">' +
+    counts.filter(function (x) { return x.c; }).map(function (x) { var p = x.c / total * 100; return '<span class="stack__seg" style="flex:' + x.c + ' 1 0;background:color-mix(in srgb, var(--' + x.m.color + ') 30%, var(--bg-surface))" title="' + x.m.label + ': ' + x.c + ' (' + Math.round(p) + '%)">' + (p >= 9 ? Math.round(p) + '%' : '') + '</span>'; }).join('') + '</div>';
+  var list = '<ul class="moodlist">' + counts.map(function (x) { return '<li>' + moodIcon(x.m.key) + '<span class="t-strong">' + x.m.label + '</span><span class="num muted">' + x.c + ' entries</span><span class="num t-metric-sm" style="min-width:44px;text-align:right">' + Math.round(x.c / total * 100) + '%</span></li>'; }).join('') + '</ul>';
+  var positive = counts[0].c + counts[1].c, negative = counts[3].c + counts[4].c;
+  var tl = '<ol class="tl">' + rows.slice(0, 6).map(function (r) { var m = MOODBY[r.mood]; return '<li><span class="tl__ic" style="background:color-mix(in srgb, var(--' + m.color + ') 18%, var(--bg-surface))">' + moodIcon(r.mood) + '</span><div><p class="t-strong">' + m.label + ' <span class="t-caption subtle" style="font-weight:400">· ' + rel(r.t) + '</span></p><p class="t-small ' + (r.note ? 'muted' : 'subtle') + '">' + (r.note ? esc(r.note) : 'No note') + '</p></div></li>'; }).join('') + '</ol>';
+  out.html += '<div class="grid g2">' +
+    card('Mood distribution', stack + list + '<p class="t-small muted">' + total + ' check-ins on ' + new Set(rows.map(function (r) { return iso(r.t); })).size + ' of ' + rangeDays() + ' days · ' + Math.round(positive / total * 100) + '% Great or Good · ' + Math.round(negative / total * 100) + '% Low or Stressed</p>') +
+    card('Recent entries', tl) + '</div>' + card('All entries', tableHTML('mood'));
+  defTable('mood', 'Mood entries', [
+    { h: 'Date and time', f: function (r) { return '<span class="num">' + fmtDT(r.t) + '</span>'; } },
+    { h: 'Mood', f: function (r) { return moodBadge(r.mood); } },
+    { h: 'Note', f: function (r) { return r.note ? esc(r.note) : '<span class="subtle">No note</span>'; } }
+  ], rows);
+  out.after = function () { renderTable('mood'); };
+  return out;
+}
+
+/* ---------- Menstrual ---------- */
+function viewMenstrual(st) {
+  var out = { html: controlsBar() };
+  if (st === 'empty') {
+    out.html += card('Menstrual profile', emptyBlock('calendar', 'Menstrual profile not created', 'Priya hasn’t set up cycle tracking in the app. Her cycle profile, current phase and predictions appear here after she adds her last period date. Admins can’t create this profile.'));
+    return out;
+  }
+  var p = MENSTRUAL, L = p.typicalCycleLength, P = p.typicalPeriodLength;
+  var day = Math.floor((T0 - p.lastPeriodStartDate) / DAY) + 1;
+  var ovu = L - 14;
+  var phases = [['period', 'Period', 1, P], ['foll', 'Follicular', P + 1, ovu - 2], ['ovu', 'Ovulation window', ovu - 1, ovu + 1], ['lut', 'Luteal', ovu + 2, L]];
+  var cur = phases.filter(function (x) { return day >= x[2] && day <= x[3]; })[0] || phases[3];
+  var next = new Date(p.lastPeriodStartDate.getTime() + L * DAY), inDays = Math.round((next - T0) / DAY);
+  var cycles = [0, 1, 2].map(function (k) { var s = new Date(p.lastPeriodStartDate.getTime() + k * L * DAY); return { start: s, end: new Date(s.getTime() + (L - 1) * DAY), pred: k > 0 }; });
+  var strip = '<div class="cycles" role="img" aria-label="Cycle timeline. Current cycle ' + fmtD(cycles[0].start) + ' to ' + fmtD(cycles[0].end) + ', today is day ' + day + ', ' + cur[1] + '. Predicted cycles start ' + fmtD(cycles[1].start) + ' and ' + fmtD(cycles[2].start) + '.">' +
+    cycles.map(function (c) {
+      return '<div class="cycle' + (c.pred ? ' cycle--pred' : '') + '"><div><p class="t-label">' + fmtD(c.start) + ' – ' + fmtD(c.end) + '</p><p class="t-caption subtle">' + (c.pred ? 'Predicted' : 'Current cycle') + '</p></div><div class="cycle__bar" aria-hidden="true">' +
+        phases.map(function (x) { var len = x[3] - x[2] + 1; return '<span class="ph ph--' + x[0] + '" style="flex:' + len + ' 1 0">' + (len >= 4 ? x[1].replace(' window', '') : '') + '</span>'; }).join('') +
+        (!c.pred ? '<span class="today" style="left:calc(' + ((day - .5) / L * 100).toFixed(2) + '% - 1px)"></span>' : '') + '</div></div>';
+    }).join('') + '</div>';
+  out.html += '<div class="grid g3">' +
+    card('Cycle profile', '<dl class="dl"><dt>Last period start</dt><dd>' + fmtDY(p.lastPeriodStartDate) + '</dd><dt>Typical cycle length</dt><dd>' + L + ' days</dd><dt>Typical period length</dt><dd>' + P + ' days</dd><dt>Cycle regularity</dt><dd>' + p.cycleRegularity + '</dd><dt>Profile updated</dt><dd>' + fmtDT(p.updated) + '</dd></dl>') +
+    card('Current phase', '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="t-metric-lg">' + cur[1] + '</span></div><p class="t-body muted">Cycle day <strong class="num" style="color:var(--ink)">' + day + '</strong> of ' + L + ' · estimated from the profile</p><div class="cycle__bar" aria-hidden="true" style="height:12px">' + phases.map(function (x) { return '<span class="ph ph--' + x[0] + '" style="flex:' + (x[3] - x[2] + 1) + ' 1 0"></span>'; }).join('') + '<span class="today" style="left:calc(' + ((day - .5) / L * 100).toFixed(2) + '% - 1px)"></span></div>') +
+    card('Next predicted period', '<span class="t-metric-lg num">' + fmtDY(next) + '</span><p class="t-body muted">In <strong class="num" style="color:var(--ink)">' + inDays + ' days</strong> · expected to last about ' + P + ' days</p><p class="t-caption subtle">Prediction assumes a regular ' + L + '-day cycle.</p>') +
+    '</div>' +
+    card('Cycle timeline', legend([{ band: 'color-mix(in srgb, var(--chart-4) 26%, var(--bg-surface))', label: 'Period' }, { band: 'color-mix(in srgb, var(--chart-2) 22%, var(--bg-surface))', label: 'Follicular' }, { band: 'color-mix(in srgb, var(--chart-1) 28%, var(--bg-surface))', label: 'Ovulation window' }, { band: 'color-mix(in srgb, var(--chart-3) 22%, var(--bg-surface))', label: 'Luteal' }]) +
+      '<div style="padding-top:18px">' + strip + '</div><p class="t-caption subtle">Hatched bars are predictions. Phases are estimated from the profile, not from logged symptoms, so the date range above doesn’t filter this view.</p>') +
+    card('AI-generated insight', '<div class="card__head"><p class="t-h3">Tips for the ' + cur[1].toLowerCase() + '</p><span class="badge b-info">' + ic('sparkle') + 'AI-generated</span></div>' +
+      '<ul class="t-body"><li>Energy is usually higher now. A good week to keep all four workout days.</li><li>Add protein at breakfast (paneer, curd or sprouts) to stay full on the weight-loss plan.</li><li>Keep water near 14 glasses; she has averaged under 12 this month.</li></ul>' +
+      '<p class="t-caption subtle">Generated by FitLog AI on Nov 6, 07:00 from the profile above and shown to the user in the app. Not reviewed by a clinician. Not user-entered data.</p>', { cls: 'ai', aria: 'AI-generated insight, separate from user data' });
+  return out;
+}
+
+/* ---------- Render ---------- */
+var VIEWS = { overview: viewOverview, workout: viewWorkout, diet: viewDiet, vitals: viewVitals, activity: viewActivity, mood: viewMood, menstrual: viewMenstrual };
+function renderKpis() {
+  $('#kpis').innerHTML =
+    '<div class="kpi"><span class="t-small muted">BMI</span><div class="kpi__row"><span class="t-metric num">27.27</span><span class="badge b-warning">' + ic('up') + 'Overweight</span></div><span class="t-caption subtle">160 cm · healthy 18.5–24.9</span></div>' +
+    '<div class="kpi"><span class="t-small muted">Current weight</span><span class="t-metric num">69.80 <span class="t-small muted">kg</span></span><span class="t-caption subtle">Updated Nov 4</span></div>' +
+    '<div class="kpi"><span class="t-small muted">Target weight</span><span class="t-metric num">60 <span class="t-small muted">kg</span></span><span class="t-caption subtle">In 5 weeks · 9.8 kg to go</span></div>' +
+    '<div class="kpi"><span class="t-small muted">Exercise commitment</span><span class="t-metric num">4 days · 30 min</span><span class="t-caption subtle">Mon, Wed, Fri, Sat · morning</span></div>' +
+    '<div class="kpi"><span class="t-small muted">Plan period</span><span class="t-metric num">Nov 1 – 30</span><span class="t-caption subtle">Day 6 of 30</span></div>';
+}
+function renderTabs() {
+  var vis = visibleTabs();
+  if (!vis.some(function (t) { return t.id === S.tab; })) S.tab = 'overview';
+  $('#tabs').innerHTML = vis.map(function (t) {
+    var on = t.id === S.tab;
+    return '<button type="button" class="tab" role="tab" id="tab-' + t.id + '" aria-controls="panel" aria-selected="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-tab="' + t.id + '">' + t.label + '</button>';
+  }).join('');
+  $('#panel').setAttribute('aria-labelledby', 'tab-' + S.tab);
+}
+var ticket = 0;
+function renderPanel(opts) {
+  opts = opts || {};
+  destroyCharts();
+  var my = ++ticket, st = stateFor(S.tab), panel = $('#panel');
+  if (st === 'loading') { panel.innerHTML = skeleton(S.tab); return; }
+  var draw = function () {
+    if (my !== ticket) return;
+    var v = VIEWS[S.tab](st);
+    panel.innerHTML = v.html;
+    panel.setAttribute('aria-busy', 'false');
+    if (v.after) v.after();
+    if (opts.focus) { var f = panel.querySelector(opts.focus); if (f) f.focus(); }
+  };
+  if (opts.instant) draw();
+  else { panel.innerHTML = skeleton(S.tab); panel.setAttribute('aria-busy', 'true'); setTimeout(draw, 420); }
+}
+function renderProto() {
+  $('#modeCtl').outerHTML = seg('mode', [['sample', 'Sample data'], ['loading', 'Loading'], ['empty', 'Empty'], ['populated', 'Populated']], S.mode, 'Tab state').replace('class="seg"', 'class="seg" id="modeCtl"');
+  $('#themeCtl').outerHTML = seg('theme', [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']], S.theme, 'Theme').replace('class="seg"', 'class="seg" id="themeCtl"');
+  $('#sexCtl').outerHTML = seg('sex', [['female', 'Female'], ['male', 'Male']], S.sex, 'User sex').replace('class="seg"', 'class="seg" id="sexCtl"');
+}
+function renderNav() {
+  var S2 = [[null, [['Dashboard', 'dashboard'], ['Clinical alerts', 'alert', 4], ['Reports', 'report']]], ['User management', [['Users & Health Profiles', 'users', 0, 1]]],
+    ['Clinical & fitness', [['Exercise Library', 'exercise'], ['Workout Plans', 'plans'], ['Yoga & Asana Studio', 'yoga'], ['Diet & Nutrition', 'nutrition']]],
+    ['Content & engagement', [['Banners', 'content'], ['FAQs', 'help'], ['Push Notifications', 'push']]],
+    ['System & platform', [['Mobile App Config', 'device'], ['Master Taxonomies', 'taxonomy'], ['Admins & Roles', 'shield'], ['Audit Log', 'history'], ['System Health', 'server']]]];
+  $('#sidenav').innerHTML = S2.map(function (sec) {
+    return (sec[0] ? '<p class="side__label t-overline">' + sec[0] + '</p>' : '<p class="side__label t-overline">Overview</p>') + sec[1].map(function (it) {
+      return '<button type="button" class="navi t-strong" data-nav="' + it[0] + '" aria-label="' + it[0] + '"' + (it[3] ? ' aria-current="page"' : '') + '>' + ic(it[1], 'ic-md') + '<span class="lbl">' + it[0] + '</span>' + (it[2] ? '<span class="navi__count num" aria-label="' + it[2] + ' open">' + it[2] + '</span>' : '') + '</button>';
+    }).join('');
+  }).join('');
+}
+function applyTheme() {
+  var r = document.documentElement;
+  if (S.theme === 'system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', S.theme);
+  try { localStorage.setItem('fitlog360', JSON.stringify({ theme: S.theme })); } catch (e) {}
+}
+var toastT;
+function toast(msg) { var t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 3800); }
+
+/* ---------- Events ---------- */
+function setRadio(name, val) {
+  if (name === 'mode') { S.mode = val; renderProto(); renderTabs(); renderPanel({ instant: val === 'loading' }); }
+  else if (name === 'theme') { S.theme = val; applyTheme(); renderProto(); renderPanel({ instant: true }); }
+  else if (name === 'sex') {
+    S.sex = val; renderProto(); renderTabs(); renderPanel({ instant: true });
+    $('#heroMeta').firstChild.nodeValue = (val === 'female' ? 'Priya Sharma · Female · 25' : 'Arjun Sharma · Male · 25') + ' · Joined Aug 14, 2026 · ';
+    $('#crumbName').textContent = val === 'female' ? 'Priya Sharma' : 'Arjun Sharma'; $('#heroInitial').textContent = val === 'female' ? 'P' : 'A';
+  }
+  else if (name === 'range') { S.range = val; S.rangeErr = ''; if (val === 'custom' && !S.from) { S.from = new Date(T0.getTime() - 29 * DAY); S.to = T0; } resetPages(); renderPanel({ focus: '[data-radio="range"] [aria-checked="true"]' }); }
+  else if (name === 'vitals') { S.vitals = val; resetPages(); renderPanel({ focus: '[data-radio="vitals"] [aria-checked="true"]' }); }
+  else if (name === 'sugarCtx') { S.sugarCtx = val; resetPages(); renderPanel({ instant: true, focus: '[data-radio="sugarCtx"] [aria-checked="true"]' }); }
+}
+function selectTab(id, focus) { S.tab = id; renderTabs(); renderPanel(); if (focus) $('#tab-' + id).focus(); }
+
+document.addEventListener('click', function (e) {
+  var b;
+  if ((b = e.target.closest('[data-tab]'))) return selectTab(b.getAttribute('data-tab'));
+  if ((b = e.target.closest('[role="radio"]'))) { var g = b.closest('[data-radio]'); return setRadio(g.getAttribute('data-radio'), b.getAttribute('data-val')); }
+  if ((b = e.target.closest('[data-goto]'))) { var parts = b.getAttribute('data-goto').split(':'); if (parts[1]) S.vitals = parts[1]; return selectTab(parts[0], true); }
+  if ((b = e.target.closest('[data-page]'))) { var pp = b.getAttribute('data-page').split(':'); S.page[pp[0]] = +pp[1]; renderTable(pp[0]); var h = document.getElementById('tbl-' + pp[0]); var nb = h && h.querySelector('[data-page="' + b.getAttribute('data-page') + '"]'); if (nb && !nb.disabled) nb.focus(); return; }
+  if ((b = e.target.closest('[data-range]'))) { S.range = b.getAttribute('data-range'); resetPages(); return renderPanel(); }
+  if ((b = e.target.closest('#applyRange'))) {
+    var f = $('#dFrom').value, t = $('#dTo').value;
+    if (!f || !t) { S.rangeErr = 'Choose both dates.'; }
+    else { var fd = new Date(f + 'T00:00'), td = new Date(t + 'T00:00'); if (fd > td) S.rangeErr = 'Start date must be on or before the end date.'; else { S.rangeErr = ''; S.from = fd; S.to = td; } }
+    resetPages(); return renderPanel({ instant: !!S.rangeErr });
+  }
+  if ((b = e.target.closest('#actBtn'))) { return toggleMenu(); }
+  if ((b = e.target.closest('[data-act]'))) { closeMenu(true); return toast(b.getAttribute('data-act') + ' opens a confirmation dialog in the full panel. Not part of this prototype.'); }
+  if ((b = e.target.closest('[data-nav]'))) { return toast(b.getAttribute('data-nav') + ' is outside this prototype.'); }
+  if ((b = e.target.closest('#searchBtn, #bellBtn'))) { return toast('Outside this prototype.'); }
+  if (!e.target.closest('.menuwrap')) closeMenu();
+});
+document.addEventListener('change', function (e) {
+  var s = e.target.closest('[data-size]');
+  if (s) { var k = s.getAttribute('data-size'); S.size[k] = +s.value; S.page[k] = 1; renderTable(k); var ns = document.querySelector('[data-size="' + k + '"]'); if (ns) ns.focus(); }
+});
+document.addEventListener('keydown', function (e) {
+  var cur = e.target, group = cur.closest('[role="tablist"], [role="radiogroup"]');
+  if (group && (cur.getAttribute('role') === 'tab' || cur.getAttribute('role') === 'radio')) {
+    var items = Array.prototype.slice.call(group.querySelectorAll('[role="tab"], [role="radio"]'));
+    var i = items.indexOf(cur), j = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') j = (i + 1) % items.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') j = (i - 1 + items.length) % items.length;
+    else if (e.key === 'Home') j = 0; else if (e.key === 'End') j = items.length - 1;
+    if (j >= 0) {
+      e.preventDefault();
+      var nx = items[j];
+      if (nx.getAttribute('role') === 'tab') selectTab(nx.getAttribute('data-tab'), true);
+      else { setRadio(group.getAttribute('data-radio'), nx.getAttribute('data-val')); var again = document.querySelector('[data-radio="' + group.getAttribute('data-radio') + '"] [data-val="' + nx.getAttribute('data-val') + '"]'); if (again) again.focus(); }
+    }
+    return;
+  }
+  var menu = $('#actMenu');
+  if (!menu.hidden) {
+    var mi = Array.prototype.slice.call(menu.querySelectorAll('[role="menuitem"]')), k = mi.indexOf(document.activeElement);
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); mi[(k + 1) % mi.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); mi[(k - 1 + mi.length) % mi.length].focus(); }
+    else if (e.key === 'Tab') closeMenu();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); toast('Global search is outside this prototype.'); }
+});
+function toggleMenu() { var m = $('#actMenu'); if (m.hidden) { m.hidden = false; $('#actBtn').setAttribute('aria-expanded', 'true'); m.querySelector('[role="menuitem"]').focus(); } else closeMenu(true); }
+function closeMenu(refocus) { var m = $('#actMenu'); if (m.hidden) return; m.hidden = true; $('#actBtn').setAttribute('aria-expanded', 'false'); if (refocus) $('#actBtn').focus(); }
+if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); var onMq = function () { if (S.theme === 'system') renderPanel({ instant: true }); }; if (mq.addEventListener) mq.addEventListener('change', onMq); }
+
+/* ---------- Boot ---------- */
+applyTheme(); renderNav(); renderProto(); renderKpis(); renderTabs(); renderPanel({ instant: true });
+})();
+</script>
+
+</body></html>

@@ -44,6 +44,7 @@ const AppConfigSchema = new Schema<iAppConfig>(
         companyPolicies: { type: companyPoliciesSchema },
         forceUpdate: { type: forceUpdateSchema },
         forceUpdateMessage: { type: String, trim: true },
+        isOtpEnabled: { type: Boolean },
         supportEmail: { type: String, trim: true, lowercase: true },
         supportPhone: { type: String, trim: true },
         playStoreUrl: { type: String, trim: true },

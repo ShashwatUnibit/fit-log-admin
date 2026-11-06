@@ -129,7 +129,7 @@ export default class AppConfigController {
 
             // A base configuration starts with every optional contact and store link empty, like the user app's own schema
             const fields: iAppConfigFields = isBase
-                ? { supportEmail: null, supportPhone: null, playStoreUrl: null, appStoreUrl: null, apkDownloadUrl: null, ...service.pickFields(validation.value) }
+                ? { isOtpEnabled: true, supportEmail: null, supportPhone: null, playStoreUrl: null, appStoreUrl: null, apkDownloadUrl: null, ...service.pickFields(validation.value) }
                 : service.pickFields(validation.value);
 
             const problem = this.validateFields({ platform, base, fields });
@@ -460,6 +460,39 @@ export default class AppConfigController {
                 message: enabled ? `Maintenance mode is ON for ${platform}` : `Maintenance mode is OFF for ${platform}`,
                 httpCode: eHttpStatusCode.OK,
                 data: { updated, platform, enabled },
+            });
+        } catch (err: unknown) {
+            this.fail({ req, res }, err);
+        }
+    }
+
+    /** Turns OTP login on or off for the whole platform (every version that does not set its own value inherits it). */
+    public async setOtp(req: Request, res: Response): Promise<void> {
+        const validation = AppConfigValidator.instance.otpSchema.validate(req.body ?? {});
+        if (validation.error) {
+            this.reject({ req, res }, validation.error.message);
+            return;
+        }
+
+        try {
+            const actor = await this.requireSuperAdmin({ req, res });
+            if (!actor) {
+                return;
+            }
+
+            const { platform, enabled } = validation.value;
+            const base = await this.findBase(platform);
+            if (!base) {
+                this.conflict({ req, res }, `Create the base configuration for ${platform} first.`);
+                return;
+            }
+
+            const updated = await AppConfigService.instance.applyOtp({ platform, enabled, actor });
+            this.reply({ req, res }, {
+                status: eResponseStatus.SUCCESS,
+                message: enabled ? `OTP is ON for ${platform}` : `OTP is OFF for ${platform}`,
+                httpCode: eHttpStatusCode.OK,
+                data: { updated, platform, isOtpEnabled: enabled },
             });
         } catch (err: unknown) {
             this.fail({ req, res }, err);

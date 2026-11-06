@@ -3,6 +3,27 @@ export interface iNamedRef {
     name: string | null;
 }
 
+export interface iVitalReading {
+    status: string;
+    loggedAt: Date;
+}
+
+export interface iDailyProgress {
+    value: number;
+    goal: number;
+    percentOfGoal: number;
+    asOf: Date;
+}
+
+export interface iUserVitals {
+    bloodPressure: (iVitalReading & { systolic: number; diastolic: number; unit: "mmHg" }) | null;
+    bloodSugar: (iVitalReading & { value: number; unit: "mg/dL"; mealContext: string | null; mealContextLabel: string | null }) | null;
+    heartRate: (iVitalReading & { value: number; unit: "bpm" }) | null;
+    stepsToday: iDailyProgress & { unit: "steps" };
+    waterToday: iDailyProgress & { unit: "glasses" };
+    latestMood: { mood: string; label: string; sentiment: "positive" | "neutral" | "negative" | "unknown"; loggedAt: Date } | null;
+}
+
 export interface iUserOverview {
     header: {
         userId: string;
@@ -60,4 +81,5 @@ export interface iUserOverview {
         foodIntolerances: iNamedRef[];
         dietaryRestrictions: iNamedRef[];
     };
+    vitals: iUserVitals;
 }

@@ -8,6 +8,7 @@ import {
     iEffectiveQuery,
     iForceUpdatePayload,
     iMaintenancePayload,
+    iOtpPayload,
     iUpdateAppConfigPayload,
 } from "../interfaces/appConfig.interface";
 
@@ -81,6 +82,9 @@ export default class AppConfigValidator {
             forceUpdateMessage: needed(Joi.string().trim().min(1).max(MESSAGE_MAX), "forceUpdateMessage").messages({
                 "string.empty": `"forceUpdateMessage" cannot be empty`,
                 "string.max": `"forceUpdateMessage" must be at most {#limit} characters`,
+            }),
+            isOtpEnabled: Joi.boolean().strict().messages({
+                "boolean.base": `"isOtpEnabled" must be true or false`,
             }),
             supportEmail: Joi.string().trim().email({ tlds: { allow: false } }).max(120).allow(null).messages({
                 "string.email": `"supportEmail" must be a valid email address`,
@@ -156,6 +160,14 @@ export default class AppConfigValidator {
         message: Joi.string().trim().min(1).max(MESSAGE_MAX).messages({
             "string.empty": `"message" cannot be empty`,
             "string.max": `"message" must be at most {#limit} characters`,
+        }),
+    }).options({ convert: true, abortEarly: true, allowUnknown: false });
+
+    public otpSchema = Joi.object<iOtpPayload>({
+        platform: this.platform,
+        enabled: Joi.boolean().strict().required().messages({
+            "boolean.base": `"enabled" must be true or false`,
+            "any.required": `"enabled" is a required field`,
         }),
     }).options({ convert: true, abortEarly: true, allowUnknown: false });
 

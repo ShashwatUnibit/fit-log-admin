@@ -28,6 +28,8 @@ export interface iAppConfigFields {
     companyPolicies?: iCompanyPolicies;
     forceUpdate?: iForceUpdate;
     forceUpdateMessage?: string;
+    // Whether the user app asks for an OTP at login. Inherited from the base unless a version overrides it.
+    isOtpEnabled?: boolean;
     supportEmail?: string | null;
     supportPhone?: string | null;
     playStoreUrl?: string | null;
@@ -91,6 +93,11 @@ export interface iMaintenancePayload {
     platform: eAppPlatform;
     enabled: boolean;
     message?: string;
+}
+
+export interface iOtpPayload {
+    platform: eAppPlatform;
+    enabled: boolean;
 }
 
 export interface iEffectiveQuery {
